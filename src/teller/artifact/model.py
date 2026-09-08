@@ -29,7 +29,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from typing import Annotated, Literal
+from typing import Annotated, ClassVar, Literal
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator, model_validator
 
@@ -274,7 +274,7 @@ class Predicate(Strict):
     any_of: list[Predicate] | None = None
     all: list[Predicate] | None = None
 
-    LEAVES: tuple[str, ...] = (
+    LEAVES: ClassVar[tuple[str, ...]] = (
         "text_contains",
         "text_matches",
         "url_matches",

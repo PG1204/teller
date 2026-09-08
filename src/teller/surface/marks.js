@@ -237,7 +237,7 @@
     anchorCache.set(table, anchor);
     return anchor;
   };
-  const isDataTable = (table) => !!table.querySelector("th");
+  const isDataTable = (table) => Array.from(table.querySelectorAll("th")).some((th) => th.closest("table") === table);
   const headerCells = (table) => {
     const rows = Array.from(table.rows);
     const hr = rows.find((r) => r.querySelector("th")) || rows[0];

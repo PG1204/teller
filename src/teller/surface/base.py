@@ -101,6 +101,9 @@ class Observation(BaseModel):
     screenshot_jpeg: bytes | None = Field(default=None, exclude=True, repr=False)
     screenshot_path: str | None = None
     detector_hits: list[str] = Field(default_factory=list)
+    selector_hits: dict[str, bool] = Field(
+        default_factory=dict, description='"frame|selector" -> exists, for css_exists predicates.'
+    )
 
     def element(self, mark_id: int) -> Element:
         for e in self.elements:
@@ -150,6 +153,7 @@ class Resolution(BaseModel):
     )
     diagnostics: list[dict[str, Any]] = Field(default_factory=list)
     element: Element | None = None
+    failure: Literal["not_found", "ambiguous", "frame_missing"] | None = None
 
     @property
     def ok(self) -> bool:

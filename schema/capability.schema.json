@@ -695,28 +695,6 @@
       "additionalProperties": false,
       "description": "A single observable condition. Exactly one leaf field, or ``any_of``/``all``.\n\n``{param}`` placeholders inside string leaves are substituted at evaluation time.",
       "properties": {
-        "LEAVES": {
-          "default": [
-            "text_contains",
-            "text_matches",
-            "url_matches",
-            "title_matches",
-            "http_status",
-            "http_status_gte",
-            "css_exists",
-            "value_equals",
-            "output_present",
-            "dialog_text_matches",
-            "detector",
-            "any_of",
-            "all"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "title": "Leaves",
-          "type": "array"
-        },
         "all": {
           "anyOf": [
             {
