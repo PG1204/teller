@@ -1,0 +1,1322 @@
+{
+  "$defs": {
+    "BusinessOutcomeResult": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Path"
+        },
+        "capability": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CapabilityRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_dir": {
+          "title": "Evidence Dir",
+          "type": "string"
+        },
+        "goal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Goal"
+        },
+        "handoffs": {
+          "items": {
+            "$ref": "#/$defs/Handoff"
+          },
+          "title": "Handoffs",
+          "type": "array"
+        },
+        "llm_invoked": {
+          "title": "Llm Invoked",
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "replay",
+            "discovery"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/Outcome"
+        },
+        "params": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Masked by classification.",
+          "title": "Params",
+          "type": "object"
+        },
+        "policy_sha256": {
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "recoveries": {
+          "items": {
+            "$ref": "#/$defs/Recovery"
+          },
+          "title": "Recoveries",
+          "type": "array"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "const": "business_outcome",
+          "default": "business_outcome",
+          "title": "Status",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/StepReport"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "tenant": {
+          "title": "Tenant",
+          "type": "string"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/Warning"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_id",
+        "mode",
+        "tenant",
+        "evidence_dir",
+        "timing",
+        "llm_invoked",
+        "policy_sha256",
+        "outcome"
+      ],
+      "title": "BusinessOutcomeResult",
+      "type": "object"
+    },
+    "CapabilityRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "status"
+      ],
+      "title": "CapabilityRef",
+      "type": "object"
+    },
+    "Declined": {
+      "additionalProperties": false,
+      "properties": {
+        "by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "By"
+        },
+        "code": {
+          "$ref": "#/$defs/DeclinedCode"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Step Id"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "Declined",
+      "type": "object"
+    },
+    "DeclinedCode": {
+      "description": "A human made a decision that ended the run. Not a defect, not a business outcome.",
+      "enum": [
+        "ABORTED_BY_HUMAN",
+        "CONFIRMATION_DECLINED"
+      ],
+      "title": "DeclinedCode",
+      "type": "string"
+    },
+    "DeclinedResult": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Path"
+        },
+        "capability": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CapabilityRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "declined": {
+          "$ref": "#/$defs/Declined"
+        },
+        "evidence_dir": {
+          "title": "Evidence Dir",
+          "type": "string"
+        },
+        "goal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Goal"
+        },
+        "handoffs": {
+          "items": {
+            "$ref": "#/$defs/Handoff"
+          },
+          "title": "Handoffs",
+          "type": "array"
+        },
+        "llm_invoked": {
+          "title": "Llm Invoked",
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "replay",
+            "discovery"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Masked by classification.",
+          "title": "Params",
+          "type": "object"
+        },
+        "policy_sha256": {
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "recoveries": {
+          "items": {
+            "$ref": "#/$defs/Recovery"
+          },
+          "title": "Recoveries",
+          "type": "array"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "const": "declined",
+          "default": "declined",
+          "title": "Status",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/StepReport"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "tenant": {
+          "title": "Tenant",
+          "type": "string"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/Warning"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_id",
+        "mode",
+        "tenant",
+        "evidence_dir",
+        "timing",
+        "llm_invoked",
+        "policy_sha256",
+        "declined"
+      ],
+      "title": "DeclinedResult",
+      "type": "object"
+    },
+    "Failure": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/FailureCode"
+        },
+        "diagnostics": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Diagnostics",
+          "type": "array"
+        },
+        "dom_snapshot": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dom Snapshot"
+        },
+        "expected": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected"
+        },
+        "message": {
+          "default": "",
+          "title": "Message",
+          "type": "string"
+        },
+        "observed": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed"
+        },
+        "screenshot": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Screenshot"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Step Id"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "Failure",
+      "type": "object"
+    },
+    "FailureCode": {
+      "description": "Each failure carries step_id, expected, observed, screenshot, dom_snapshot, diagnostics.",
+      "enum": [
+        "TARGET_NOT_FOUND",
+        "TARGET_AMBIGUOUS",
+        "CHECKPOINT_FAILED",
+        "UNDECLARED_CONDITION",
+        "UNEXPECTED_DIALOG",
+        "APP_ERROR",
+        "STEP_TIMEOUT",
+        "RECOVERY_LIMIT_EXCEEDED",
+        "REAUTH_UNSAFE",
+        "OUTPUT_PARSE_FAILED",
+        "POLICY_VIOLATION",
+        "PARAM_INVALID",
+        "ARTIFACT_INVALID",
+        "NOT_APPROVED",
+        "SURFACE_CRASHED",
+        "ESCALATION_TIMEOUT",
+        "HANDOFF_LIMIT_EXCEEDED",
+        "HANDBACK_STATE_MISMATCH",
+        "RUN_TIMEOUT",
+        "INTERNAL_ERROR"
+      ],
+      "title": "FailureCode",
+      "type": "string"
+    },
+    "FailureResult": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Path"
+        },
+        "capability": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CapabilityRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_dir": {
+          "title": "Evidence Dir",
+          "type": "string"
+        },
+        "failure": {
+          "$ref": "#/$defs/Failure"
+        },
+        "goal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Goal"
+        },
+        "handoffs": {
+          "items": {
+            "$ref": "#/$defs/Handoff"
+          },
+          "title": "Handoffs",
+          "type": "array"
+        },
+        "llm_invoked": {
+          "title": "Llm Invoked",
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "replay",
+            "discovery"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Masked by classification.",
+          "title": "Params",
+          "type": "object"
+        },
+        "policy_sha256": {
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "recoveries": {
+          "items": {
+            "$ref": "#/$defs/Recovery"
+          },
+          "title": "Recoveries",
+          "type": "array"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "const": "failure",
+          "default": "failure",
+          "title": "Status",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/StepReport"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "tenant": {
+          "title": "Tenant",
+          "type": "string"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/Warning"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_id",
+        "mode",
+        "tenant",
+        "evidence_dir",
+        "timing",
+        "llm_invoked",
+        "policy_sha256",
+        "failure"
+      ],
+      "title": "FailureResult",
+      "type": "object"
+    },
+    "Handoff": {
+      "additionalProperties": false,
+      "properties": {
+        "action_count": {
+          "default": 0,
+          "title": "Action Count",
+          "type": "integer"
+        },
+        "claimed_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Claimed At"
+        },
+        "claimed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Claimed By"
+        },
+        "human_actions_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Human Actions Path"
+        },
+        "intervention_id": {
+          "title": "Intervention Id",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "reason": {
+          "default": "",
+          "title": "Reason",
+          "type": "string"
+        },
+        "released_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Released At"
+        },
+        "resume_mode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resume Mode"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Step Id"
+        },
+        "trigger": {
+          "title": "Trigger",
+          "type": "string"
+        }
+      },
+      "required": [
+        "intervention_id",
+        "trigger"
+      ],
+      "title": "Handoff",
+      "type": "object"
+    },
+    "NeedsHumanResult": {
+      "additionalProperties": false,
+      "description": "Partial result written while paused; replaced by a terminal result on finish.",
+      "properties": {
+        "artifact_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Path"
+        },
+        "capability": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CapabilityRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_dir": {
+          "title": "Evidence Dir",
+          "type": "string"
+        },
+        "goal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Goal"
+        },
+        "handoffs": {
+          "items": {
+            "$ref": "#/$defs/Handoff"
+          },
+          "title": "Handoffs",
+          "type": "array"
+        },
+        "intervention_id": {
+          "title": "Intervention Id",
+          "type": "string"
+        },
+        "llm_invoked": {
+          "title": "Llm Invoked",
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "replay",
+            "discovery"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Masked by classification.",
+          "title": "Params",
+          "type": "object"
+        },
+        "policy_sha256": {
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "recoveries": {
+          "items": {
+            "$ref": "#/$defs/Recovery"
+          },
+          "title": "Recoveries",
+          "type": "array"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "const": "needs_human",
+          "default": "needs_human",
+          "title": "Status",
+          "type": "string"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Step Id"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/StepReport"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "tenant": {
+          "title": "Tenant",
+          "type": "string"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "trigger": {
+          "title": "Trigger",
+          "type": "string"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/Warning"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_id",
+        "mode",
+        "tenant",
+        "evidence_dir",
+        "timing",
+        "llm_invoked",
+        "policy_sha256",
+        "intervention_id",
+        "trigger"
+      ],
+      "title": "NeedsHumanResult",
+      "type": "object"
+    },
+    "Outcome": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "description": "Declared in the artifact's business_outcomes.",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "default": "",
+          "title": "Message",
+          "type": "string"
+        },
+        "returns": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Returns",
+          "type": "object"
+        },
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "step_id"
+      ],
+      "title": "Outcome",
+      "type": "object"
+    },
+    "Recovery": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/RecoveryCode"
+        },
+        "condition_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Condition Id"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Step Id"
+        },
+        "times": {
+          "default": 1,
+          "title": "Times",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "Recovery",
+      "type": "object"
+    },
+    "RecoveryCode": {
+      "description": "Reported in ``recoveries[]``; never terminal on their own.",
+      "enum": [
+        "INTERSTITIAL_DISMISSED",
+        "KNOWN_DIALOG_HANDLED",
+        "SLOW_LOAD_WAITED",
+        "SESSION_REESTABLISHED",
+        "LOCATOR_FALLBACK_USED"
+      ],
+      "title": "RecoveryCode",
+      "type": "string"
+    },
+    "StepReport": {
+      "additionalProperties": false,
+      "properties": {
+        "duration_ms": {
+          "default": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "index_used": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Index Used"
+        },
+        "locator_kind": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locator Kind"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "screenshot": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Screenshot"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "failed",
+            "skipped",
+            "outcome",
+            "human"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step_id",
+        "status"
+      ],
+      "title": "StepReport",
+      "type": "object"
+    },
+    "SuccessResult": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artifact Path"
+        },
+        "capability": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CapabilityRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_dir": {
+          "title": "Evidence Dir",
+          "type": "string"
+        },
+        "goal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Goal"
+        },
+        "handoffs": {
+          "items": {
+            "$ref": "#/$defs/Handoff"
+          },
+          "title": "Handoffs",
+          "type": "array"
+        },
+        "llm_invoked": {
+          "title": "Llm Invoked",
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "replay",
+            "discovery"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "outputs": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Outputs",
+          "type": "object"
+        },
+        "params": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Masked by classification.",
+          "title": "Params",
+          "type": "object"
+        },
+        "policy_sha256": {
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "recoveries": {
+          "items": {
+            "$ref": "#/$defs/Recovery"
+          },
+          "title": "Recoveries",
+          "type": "array"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "const": "success",
+          "default": "success",
+          "title": "Status",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/StepReport"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "tenant": {
+          "title": "Tenant",
+          "type": "string"
+        },
+        "timing": {
+          "$ref": "#/$defs/Timing"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/$defs/Warning"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_id",
+        "mode",
+        "tenant",
+        "evidence_dir",
+        "timing",
+        "llm_invoked",
+        "policy_sha256",
+        "outputs"
+      ],
+      "title": "SuccessResult",
+      "type": "object"
+    },
+    "Timing": {
+      "additionalProperties": false,
+      "properties": {
+        "duration_ms": {
+          "default": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finished At"
+        },
+        "paused_ms": {
+          "default": 0,
+          "description": "Wall clock spent waiting on a human.",
+          "title": "Paused Ms",
+          "type": "integer"
+        },
+        "started_at": {
+          "title": "Started At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "started_at"
+      ],
+      "title": "Timing",
+      "type": "object"
+    },
+    "Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "DRIFT_WARNING",
+            "DRIFT_SUSPECTED",
+            "VERSION_RANGE_MISMATCH",
+            "ATTENDED_FORCED"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "index_used": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Index Used"
+        },
+        "message": {
+          "default": "",
+          "title": "Message",
+          "type": "string"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Step Id"
+        },
+        "suggest_override": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggest Override"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "Warning",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/teller/schema/result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Only used to export a single JSON Schema for ``result.json``.",
+  "properties": {
+    "result": {
+      "discriminator": {
+        "mapping": {
+          "business_outcome": "#/$defs/BusinessOutcomeResult",
+          "declined": "#/$defs/DeclinedResult",
+          "failure": "#/$defs/FailureResult",
+          "needs_human": "#/$defs/NeedsHumanResult",
+          "success": "#/$defs/SuccessResult"
+        },
+        "propertyName": "status"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SuccessResult"
+        },
+        {
+          "$ref": "#/$defs/BusinessOutcomeResult"
+        },
+        {
+          "$ref": "#/$defs/FailureResult"
+        },
+        {
+          "$ref": "#/$defs/DeclinedResult"
+        },
+        {
+          "$ref": "#/$defs/NeedsHumanResult"
+        }
+      ],
+      "title": "Result"
+    }
+  },
+  "required": [
+    "result"
+  ],
+  "title": "ResultEnvelope",
+  "type": "object"
+}

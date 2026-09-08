@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="2" cellspacing="0">
+<tr><td colspan="3"><font size="3"><b>Member Search</b></font></td></tr>
+<tr><td colspan="3" height="8"></td></tr>
+<form method="get" action="/console/members/results" name="frmSearch">
+<tr>
+<td align="right">Member #</td>
+<td width="6">&nbsp;</td>
+<td><input type="text" name="txtF1" size="12" maxlength="10"></td>
+</tr>
+<tr>
+<td align="right">Last Name</td>
+<td width="6">&nbsp;</td>
+<td><input type="text" name="txtF2" size="24" maxlength="40"></td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td width="6">&nbsp;</td>
+<td><input type="image" name="cmdGo" alt="Go" src="/static/go.gif" width="60" height="22" style="background-color: #003366; color: #FFFFFF; border: 1px outset #003366"></td>
+</tr>
+</form>
+<tr><td colspan="3" height="8"></td></tr>
+<tr><td colspan="3"><font size="1" color="#808080">Enter a member number for an exact match, or the first letters of a last name.</font></td></tr>
+</table>
+{% endblock %}

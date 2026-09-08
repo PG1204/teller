@@ -1,0 +1,62 @@
+# Vendor layer: shared by every capability and every tenant running the Ledgerline console.
+schema_version: 1
+profile: ledgerline-msc
+product: Ledgerline Member Servicing Console
+login:                                       # harness-only subflow; the model never sees credentials
+  entry_url: "{base_url}/login"
+  steps:
+    - id: l1
+      action: type
+      intent: Enter the operator user id
+      idempotent: true
+      target:
+        text_hint: "User ID"
+        locators:
+          - { kind: label_anchor, label: "User ID", relation: same_row_right, control: text_input }
+          - { kind: attr_stable, attr: name, value: txtU }
+      value: { secret: LEDGERLINE_USER }
+      clear_first: true
+    - id: l2
+      action: type
+      intent: Enter the operator password
+      idempotent: true
+      target:
+        text_hint: "Password"
+        locators:
+          - { kind: label_anchor, label: "Password", relation: same_row_right, control: password }
+          - { kind: attr_stable, attr: name, value: txtP }
+      value: { secret: LEDGERLINE_PASS }
+      clear_first: true
+    - id: l3
+      action: click
+      intent: Submit the login form
+      idempotent: false
+      target:
+        text_hint: "Sign In"
+        locators:
+          - { kind: role_name, role: button, name: "Sign In" }
+          - { kind: attr_stable, attr: name, value: cmdLogin }
+      wait_for: { state: url, url_matches: "/console", timeout_ms: 8000 }
+  checkpoint: { url_matches: "/console" }
+detectors:                                   # evaluated after every step of every capability
+  session_expired: { url_matches: "/login\\?reason=expired" }
+  login_wall:      { url_matches: "/login$" }
+  app_error:       { any_of: [ { http_status_gte: 500 }, { text_matches: "Application Error|ORA-[0-9]{5}" } ] }
+  access_denied:   { any_of: [ { http_status: 403 }, { text_contains: "You are not authorized" } ] }
+  not_found_page:  { text_contains: "ERR-4041" }
+  validation_row:  { css_exists: "font[color=red]" }
+recoverable_conditions:
+  - id: session_expired
+    detect: { detector: session_expired }
+    remedy: { action: run_subflow, subflow: login, then: restart_from_anchor }   # refused if a non-idempotent step already ran
+    max_times: 1
+  - id: session_expiry_alert
+    detect: { dialog_text_matches: "session will expire" }
+    remedy: { action: dismiss_dialog, accept: true }
+    max_times: 2
+sensitive_selectors:                         # masked in every screenshot and stripped from DOM snapshots
+  - "input[type=password]"
+  - "td.ssn"
+ui_fingerprint:
+  frame_names: [nav, main]
+  title_pattern: "Ledgerline .* Servicing Console"

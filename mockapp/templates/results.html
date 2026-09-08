@@ -1,0 +1,27 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr><td><font size="3"><b>Search Results</b></font></td></tr>
+<tr><td height="8"></td></tr>
+<tr><td>
+<table border="1" cellpadding="4" cellspacing="0" bordercolor="#C0C0C0" width="100%">
+<tr bgcolor="#E8EEF4">
+<th align="left">Member #</th>
+<th align="left">Name</th>
+<th align="left">Status</th>
+</tr>
+{% for m in members %}
+<tr onclick="location.href='/console/members/{{ m.number }}'" style="cursor:pointer" onmouseover="this.bgColor='#FFFFE0'" onmouseout="this.bgColor=''">
+<td>{{ m.number }}</td>
+<td>{{ m.name }}</td>
+<td>{{ m.status }}</td>
+</tr>
+{% else %}
+<tr><td colspan="3"><font color="red">No members matched your search.</font></td></tr>
+{% endfor %}
+</table>
+</td></tr>
+<tr><td height="8"></td></tr>
+<tr><td><a href="/console/members/search">&laquo; New Search</a></td></tr>
+</table>
+{% endblock %}

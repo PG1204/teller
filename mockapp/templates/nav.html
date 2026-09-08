@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>{{ title }}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/javascript">
+function go(u){ parent.frames['main'].location = u; }
+function signOut(){ parent.location = '/logout'; }
+</script>
+</head>
+<body bgcolor="#E8EEF4" text="#000000" link="#003366" vlink="#003366" style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; margin: 0px">
+<table width="100%" border="0" cellpadding="4" cellspacing="0">
+<tr><td bgcolor="#003366" height="26"><font color="#FFFFFF"><b>Menu</b></font></td></tr>
+<tr><td height="6"></td></tr>
+<tr><td>&raquo; <a href="javascript:go('/console/home')">Home</a></td></tr>
+<tr><td>&raquo; <a href="javascript:go('/console/members/search')">Members</a></td></tr>
+<tr><td>&raquo; <a href="javascript:go('/console/reports')">Reports</a></td></tr>
+<tr><td height="12"></td></tr>
+<tr><td bgcolor="#C0C0C0" height="1"></td></tr>
+<tr><td><font size="1">Signed in as<br><b>{{ user }}</b></font></td></tr>
+<tr><td>&raquo; <a href="javascript:signOut()">Sign Out</a></td></tr>
+</table>
+</body>
+</html>

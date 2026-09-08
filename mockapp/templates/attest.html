@@ -1,0 +1,24 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr><td><font size="3"><b>Attestation Required</b></font></td></tr>
+<tr><td height="8"></td></tr>
+<tr><td><font color="red">You must attest to the Member Privacy Policy before continuing.</font></td></tr>
+<tr><td height="8"></td></tr>
+<tr><td>
+<table border="1" cellpadding="8" cellspacing="0" bordercolor="#800000" bgcolor="#FFF0F0" width="100%">
+<tr><td>
+By selecting <b>I attest</b> you certify that you have read the current Member
+Privacy Policy (rev. 2026-02), that the access you are about to perform is for a
+legitimate servicing purpose, and that you understand violations are subject to
+disciplinary action.
+</td></tr>
+</table>
+</td></tr>
+<tr><td height="8"></td></tr>
+<form method="post" action="/console/attest" name="frmAttest">
+<input type="hidden" name="ret" value="{{ ret }}">
+<tr><td><input type="submit" name="cmdAttest" value="I attest"></td></tr>
+</form>
+</table>
+{% endblock %}

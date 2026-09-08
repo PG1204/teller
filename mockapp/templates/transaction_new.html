@@ -1,0 +1,53 @@
+{% extends "_base.html" %}
+{% block content %}
+{% if posted %}
+<table border="0" cellpadding="2" cellspacing="0">
+<tr><td colspan="3"><font size="3"><b>Transaction Posted</b></font></td></tr>
+<tr><td colspan="3" height="8"></td></tr>
+<tr><td align="right"><b>Reference #</b></td><td width="8">&nbsp;</td><td><b>{{ posted[0] }}</b></td></tr>
+<tr><td align="right"><b>Account #</b></td><td width="8">&nbsp;</td><td>{{ posted[1].number }} ({{ posted[1].product }})</td></tr>
+<tr><td align="right"><b>Type</b></td><td width="8">&nbsp;</td><td>{{ values.sel4 }}</td></tr>
+<tr><td align="right"><b>Amount</b></td><td width="8">&nbsp;</td><td>{{ values.txtF9 }}</td></tr>
+<tr><td align="right"><b>New Balance</b></td><td width="8">&nbsp;</td><td>{{ posted[1].balance|money }}</td></tr>
+<tr><td colspan="3" height="12"></td></tr>
+<tr><td colspan="3"><a href="/console/members/{{ member.number }}">&laquo; Return to Member Detail</a></td></tr>
+</table>
+{% else %}
+<table border="0" cellpadding="2" cellspacing="0">
+<tr><td colspan="4"><font size="3"><b>Post Transaction</b></font></td></tr>
+<tr><td colspan="4">Member {{ member.number }} &nbsp;-&nbsp; {{ member.name }}</td></tr>
+<tr><td colspan="4"><font color="#800000">Postings are final once submitted.</font></td></tr>
+<tr><td colspan="4" height="8"></td></tr>
+<form method="post" action="/console/members/{{ member.number }}/transactions/new" name="frmPost">
+<tr>
+<td align="right">Account</td>
+<td width="6">&nbsp;</td>
+<td><select name="sel5">
+{% for a in member.accounts %}<option value="{{ a.number }}"{% if values.sel5 == a.number %} selected{% endif %}>{{ a.number }} - {{ a.product }}</option>
+{% endfor %}</select></td>
+<td>{% if errors.sel5 %}<font color="red">{{ errors.sel5 }}</font>{% endif %}</td>
+</tr>
+<tr>
+<td align="right">Type</td>
+<td width="6">&nbsp;</td>
+<td><select name="sel4">
+{% for t in types %}<option value="{{ t }}"{% if values.sel4 == t %} selected{% endif %}>{{ t }}</option>
+{% endfor %}</select></td>
+<td>{% if errors.sel4 %}<font color="red">{{ errors.sel4 }}</font>{% endif %}</td>
+</tr>
+<tr>
+<td align="right">Amount</td>
+<td width="6">&nbsp;</td>
+<td>$ <input type="text" name="txtF9" size="10" maxlength="12" value="{{ values.txtF9 }}"></td>
+<td>{% if errors.txtF9 %}<font color="red">{{ errors.txtF9 }}</font>{% endif %}</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td width="6">&nbsp;</td>
+<td><input type="submit" name="cmdPost" value="Post"> <input type="button" name="cmdCancel" value="Cancel" onclick="location.href='/console/members/{{ member.number }}'"></td>
+<td>&nbsp;</td>
+</tr>
+</form>
+</table>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+# A hypothetical second institution running the same vendor build with a relabelled nav item
+# ("Member Lookup" instead of "Members"). The base capability file is never edited; this sparse
+# patch is deep-merged at load time and recorded in the run's evidence.
+tenant: example-b
+base_url: http://127.0.0.1:8600
+credentials: { LEDGERLINE_USER: env, LEDGERLINE_PASS: env }
+policy: policies/ledgerline.yaml
+app_version: "4.3"
+overrides:
+  ledgerline.member.read_savings_balance:
+    steps:
+      s1:
+        target:
+          text_hint: "Member Lookup"
+          locators:                          # lists are replaced wholesale, so the override is reviewable in one place
+            - { kind: role_name, role: link, name: "Member Lookup", robustness: "tenant relabelled the nav item" }
+            - { kind: text_exact, text: "Member Lookup" }

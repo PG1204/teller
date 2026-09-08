@@ -1,0 +1,45 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr><td><font size="3"><b>Member Detail</b></font></td></tr>
+<tr><td height="8"></td></tr>
+<tr><td>
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td align="right"><b>Member #</b></td><td width="8">&nbsp;</td><td>{{ member.number }}</td></tr>
+<tr><td align="right"><b>Name</b></td><td width="8">&nbsp;</td><td>{{ member.name }}</td></tr>
+<tr><td align="right"><b>Status</b></td><td width="8">&nbsp;</td><td>{{ member.status }}</td></tr>
+<tr><td align="right"><b>SSN (last 4)</b></td><td width="8">&nbsp;</td><td class="ssn">***-**-{{ member.ssn_last4 }}</td></tr>
+</table>
+</td></tr>
+<tr><td height="12"></td></tr>
+<tr><td><font size="2"><b>Accounts</b></font></td></tr>
+<tr><td>
+<table border="1" cellpadding="4" cellspacing="0" bordercolor="#C0C0C0" width="100%">
+<tr bgcolor="#E8EEF4">
+<th align="left">Product</th>
+<th align="left">Account #</th>
+<th align="right">Current Balance</th>
+<th align="left">Opened</th>
+</tr>
+{% for a in member.accounts %}
+<tr>
+<td>{{ a.product }}</td>
+<td>{{ a.number }}</td>
+<td align="right">{{ a.balance|money }}</td>
+<td>{{ a.opened|legacy_date }}</td>
+</tr>
+{% else %}
+<tr><td colspan="4"><i>No accounts on file.</i></td></tr>
+{% endfor %}
+</table>
+</td></tr>
+<tr><td height="12"></td></tr>
+<tr><td>
+<a href="/console/members/{{ member.number }}/subaccounts/new">Open Sub-Account</a>
+&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href="/console/members/{{ member.number }}/transactions/new">Post Transaction</a>
+&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href="/console/members/search">Member Search</a>
+</td></tr>
+</table>
+{% endblock %}

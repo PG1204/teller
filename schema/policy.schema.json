@@ -1,0 +1,209 @@
+{
+  "$defs": {
+    "ExplicitElement": {
+      "additionalProperties": false,
+      "description": "Tenant-listed control that overrides the patterns.",
+      "properties": {
+        "risk_class": {
+          "enum": [
+            "read",
+            "reversible_write",
+            "irreversible_write"
+          ],
+          "title": "Risk Class",
+          "type": "string"
+        },
+        "route": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Route"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "risk_class"
+      ],
+      "title": "ExplicitElement",
+      "type": "object"
+    },
+    "RedactionConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "known_secret_env": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Known Secret Env",
+          "type": "array"
+        },
+        "regexes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Regexes",
+          "type": "object"
+        }
+      },
+      "title": "RedactionConfig",
+      "type": "object"
+    },
+    "RiskConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "explicit_elements": {
+          "items": {
+            "$ref": "#/$defs/ExplicitElement"
+          },
+          "title": "Explicit Elements",
+          "type": "array"
+        },
+        "irreversible": {
+          "$ref": "#/$defs/RiskPatterns"
+        },
+        "reversible": {
+          "$ref": "#/$defs/RiskPatterns"
+        }
+      },
+      "title": "RiskConfig",
+      "type": "object"
+    },
+    "RiskPatterns": {
+      "additionalProperties": false,
+      "description": "Regexes on control text (accessible name / visible text / value) and route globs that\napply only to *submitting* clicks (form submit buttons), never to navigation links.",
+      "properties": {
+        "controls": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Controls",
+          "type": "array"
+        },
+        "dialog_text": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dialog Text",
+          "type": "array"
+        },
+        "submit_routes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Submit Routes",
+          "type": "array"
+        }
+      },
+      "title": "RiskPatterns",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/teller/schema/policy.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actions_allow": {
+      "items": {
+        "enum": [
+          "click",
+          "type",
+          "select",
+          "press",
+          "navigate",
+          "read",
+          "scroll",
+          "dismiss_dialog",
+          "run_subflow"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Actions Allow",
+      "type": "array"
+    },
+    "downloads": {
+      "default": false,
+      "title": "Downloads",
+      "type": "boolean"
+    },
+    "max_run_seconds": {
+      "default": 360,
+      "minimum": 10,
+      "title": "Max Run Seconds",
+      "type": "integer"
+    },
+    "max_steps": {
+      "default": 20,
+      "maximum": 200,
+      "minimum": 1,
+      "title": "Max Steps",
+      "type": "integer"
+    },
+    "navigate_allow_new_origins": {
+      "default": false,
+      "title": "Navigate Allow New Origins",
+      "type": "boolean"
+    },
+    "origins": {
+      "description": "Allowed origins, scheme://host[:port].",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Origins",
+      "type": "array"
+    },
+    "popups": {
+      "default": "close_and_log",
+      "enum": [
+        "close_and_log",
+        "block"
+      ],
+      "title": "Popups",
+      "type": "string"
+    },
+    "redaction": {
+      "$ref": "#/$defs/RedactionConfig"
+    },
+    "risk": {
+      "$ref": "#/$defs/RiskConfig"
+    },
+    "routes_allow": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Routes Allow",
+      "type": "array"
+    },
+    "routes_deny": {
+      "description": "Deny wins over allow.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Routes Deny",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "origins",
+    "actions_allow"
+  ],
+  "title": "Policy",
+  "type": "object"
+}

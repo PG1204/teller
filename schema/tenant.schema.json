@@ -1,0 +1,58 @@
+{
+  "$id": "https://github.com/teller/schema/tenant.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "``tenants/<tenant>.yaml`` \u2014 one institution's instance of the vendor product.",
+  "properties": {
+    "app_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "App Version"
+    },
+    "base_url": {
+      "title": "Base Url",
+      "type": "string"
+    },
+    "credentials": {
+      "additionalProperties": {
+        "const": "env",
+        "type": "string"
+      },
+      "description": "Secret names resolved from the environment only.",
+      "title": "Credentials",
+      "type": "object"
+    },
+    "overrides": {
+      "additionalProperties": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "description": "Sparse patches keyed by capability id. Mappings deep-merge; 'steps' is keyed by step id and deep-merges into that step; any list (e.g. locators) is replaced.",
+      "title": "Overrides",
+      "type": "object"
+    },
+    "policy": {
+      "description": "Path to the policy file.",
+      "title": "Policy",
+      "type": "string"
+    },
+    "tenant": {
+      "title": "Tenant",
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenant",
+    "base_url",
+    "policy"
+  ],
+  "title": "Tenant",
+  "type": "object"
+}

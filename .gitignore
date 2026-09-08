@@ -1,0 +1,26 @@
+# secrets
+.env
+*.key
+
+# python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# run artefacts (curated copies live in /evidence/)
+runs/
+*.trace.zip
+trace.zip
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+
+# the assignment brief is not part of the submission
+Assignment-A-Computer-Use-Automation-System.pdf

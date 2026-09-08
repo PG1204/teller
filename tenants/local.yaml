@@ -1,0 +1,7 @@
+# Tenant layer: one institution's instance of the vendor product. No flow logic lives here.
+tenant: local
+base_url: http://127.0.0.1:8600
+credentials: { LEDGERLINE_USER: env, LEDGERLINE_PASS: env }   # names only; resolved from the environment
+policy: policies/ledgerline.yaml
+app_version: "4.2"
+overrides: {}                                # see tenants/example-b.yaml for a relabelled-control override

@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr><td><font size="3"><b>Compliance Notice</b></font></td></tr>
+<tr><td height="8"></td></tr>
+<tr><td>
+<table border="1" cellpadding="8" cellspacing="0" bordercolor="#996600" bgcolor="#FFF8DC" width="100%">
+<tr><td>
+Member information accessed through this console is confidential and may be used
+only for the servicing request currently in progress. Access is logged and reviewed
+by Compliance. Do not disclose member data outside approved channels.
+</td></tr>
+</table>
+</td></tr>
+<tr><td height="8"></td></tr>
+<form method="post" action="/console/notice" name="frmNotice">
+<input type="hidden" name="ret" value="{{ ret }}">
+<tr><td><input type="submit" name="cmdAck" value="Acknowledge"></td></tr>
+</form>
+</table>
+{% endblock %}

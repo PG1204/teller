@@ -1,0 +1,167 @@
+# Hand-written sample matching the shape the emitter produces; used by tests until the real
+# discovery run emits the production artifact. provenance.discovered_by: human marks it as such.
+schema_version: 1
+capability:
+  id: ledgerline.member.read_savings_balance
+  version: 1.0.0
+  status: draft
+  title: Read a member's current Share Savings balance
+  description: >
+    Looks up a member by member number and returns the current balance and account number of
+    their Share Savings account. MEMBER_NOT_FOUND and ACCESS_DENIED are business outcomes.
+  risk_class: read
+  app:
+    profile: ledgerline-msc
+    version_range: ">=4.1 <5"
+    surface: web_legacy
+    entry_url: "{base_url}/console"
+  provenance:
+    discovered_by: human
+    recorded_at: 2026-09-08T00:00:00Z
+  review:
+    reviewed_by: null
+params:
+  member_id:
+    type: string
+    pattern: "^[0-9]{5}$"
+    required: true
+    classification: pii_low
+    description: Five-digit member number
+    example: "10001"
+outputs:
+  savings_balance:
+    type: decimal
+    parse: currency_usd
+    classification: pii_low
+    source_step: s5
+  savings_account_number:
+    type: string
+    pattern: "^[0-9]{10}$"
+    classification: pii_high
+    source_step: s6
+business_outcomes:
+  MEMBER_NOT_FOUND:
+    description: No member exists with that member_id
+    detect: { text_contains: "No members matched your search.", frame: main }
+    at_steps: [s3]
+    returns: { member_id: "{member_id}" }
+  ACCESS_DENIED:
+    description: The operator may not view this member (restricted branch)
+    detect: { any_of: [ { http_status: 403 }, { text_contains: "You are not authorized" } ], frame: main }
+    at_steps: [s4]
+  NO_SAVINGS_ACCOUNT:
+    description: The member exists but holds no Share Savings account
+    detect: { all: [ { text_contains: "Accounts", frame: main }, { detector: no_share_savings } ] }
+    at_steps: [s5]
+recoverable_conditions:
+  - id: compliance_notice
+    detect: { text_contains: "Compliance Notice", frame: main }
+    remedy:
+      action: click
+      target:
+        text_hint: "Acknowledge"
+        frame: main
+        locators:
+          - { kind: role_name, role: button, name: "Acknowledge" }
+          - { kind: text_exact, text: "Acknowledge" }
+    max_times: 1
+  - id: slow_load
+    detect: { text_contains: "Loading, please wait", frame: main }
+    remedy: { action: wait_and_retry, backoff_ms: [2000, 4000, 8000] }
+    max_times: 3
+restart_anchor: s1
+steps:
+  - id: s1
+    action: click
+    intent: Open the Members area from the left navigation
+    idempotent: true
+    target:
+      text_hint: "Members"
+      tag_hint: a
+      frame: nav
+      locators:
+        - { kind: role_name, role: link, name: "Members", robustness: "accessible name; stable across branding" }
+        - { kind: text_exact, text: "Members", robustness: "same text, no role dependency" }
+        - { kind: coords_verified, x: 62, y: 148, viewport: [1280, 800], verify_text: "Members" }
+    wait_for: { state: text, text: "Member Search", frame: main, timeout_ms: 5000 }
+    expect: { text_contains: "Member Search", frame: main }
+    risk_class: read
+  - id: s2
+    action: type
+    intent: Enter the member number
+    idempotent: true
+    target:
+      text_hint: "Member #"
+      tag_hint: input
+      frame: main
+      locators:
+        - { kind: label_anchor, label: "Member #", relation: same_row_right, control: text_input,
+            robustness: "sibling <td> label; the operator-visible label is what the vendor keeps stable" }
+        - { kind: attr_stable, attr: name, value: txtF1, robustness: "cryptic but stable in this vendor build" }
+    value: { param: member_id }
+    clear_first: true
+    expect: { value_equals: { param: member_id } }
+  - id: s3
+    action: click
+    intent: Submit the search
+    idempotent: true
+    target:
+      text_hint: "Go"
+      tag_hint: input
+      frame: main
+      locators:
+        - { kind: role_name, role: button, name: "Go", robustness: "alt text is the accessible name" }
+        - { kind: attr_stable, attr: name, value: cmdGo }
+    wait_for: { state: navigation, frame: main, timeout_ms: 5000 }
+    on_outcome: [MEMBER_NOT_FOUND]
+    expect: { text_contains: "Search Results", frame: main }
+  - id: s4
+    action: click
+    intent: Open the matching member's detail page
+    idempotent: true
+    target:
+      text_hint: "{member_id}"
+      tag_hint: tr
+      frame: main
+      locators:
+        - { kind: text_exact, text: "{member_id}", tag: tr, robustness: "row text contains the parameter; canonicalised" }
+        - { kind: xpath_anchored, anchor_text: "Member #", xpath: "ancestor::table[1]//tr[td[1][normalize-space()='{member_id}']]" }
+    wait_for: { state: text, text: "Member Detail", frame: main, timeout_ms: 8000 }
+    on_outcome: [ACCESS_DENIED]
+    expect: { all: [ { text_contains: "Member Detail", frame: main }, { text_contains: "{member_id}", frame: main } ] }
+  - id: s5
+    action: read
+    intent: Read the Share Savings balance from the Accounts table
+    idempotent: true
+    target:
+      frame: main
+      tag_hint: td
+      locators:
+        - { kind: table_cell, table_anchor: "Accounts", row_match: { column: "Product", equals: "Share Savings" }, column: "Current Balance",
+            robustness: "header-name addressed; survives column reordering" }
+        - { kind: xpath_anchored, anchor_text: "Share Savings", xpath: "ancestor::tr[1]/td[3]", robustness: "positional; flags drift" }
+    on_outcome: [NO_SAVINGS_ACCOUNT]
+    extract: { output: savings_balance, parse: currency_usd }
+  - id: s6
+    action: read
+    intent: Read the Share Savings account number
+    idempotent: true
+    target:
+      frame: main
+      tag_hint: td
+      locators:
+        - { kind: table_cell, table_anchor: "Accounts", row_match: { column: "Product", equals: "Share Savings" }, column: "Account #" }
+    extract: { output: savings_account_number, parse: string }
+    mask_in_evidence: true
+checkpoint:
+  all:
+    - { text_contains: "Member Detail", frame: main }
+    - { text_contains: "{member_id}", frame: main }
+    - { output_present: savings_balance }
+    - { output_present: savings_account_number }
+dialogs: { policy: fail_on_unknown }
+escalation_policy:
+  on_hard_failure: pause
+  on_irreversible_step: require_confirmation
+  handoff_timeout_s: 900
+  max_handoffs: 2

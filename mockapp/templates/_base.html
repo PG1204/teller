@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>{{ title }}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Pragma" content="no-cache">
+{% block head %}{% endblock %}
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#003366" vlink="#003366" style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; margin: 0px">
+{{ dialog_script|safe }}
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td colspan="3" bgcolor="#003366" height="26" style="padding-left: 8px"><font color="#FFFFFF" size="2"><b>Ledgerline Credit Union</b></font>&nbsp;<font color="#CCCCCC" size="1">Member Servicing Console</font></td>
+</tr>
+<tr><td colspan="3" bgcolor="#C0C0C0" height="1"><img src="/static/go.gif" width="1" height="1" alt=""></td></tr>
+<tr>
+<td width="12">&nbsp;</td>
+<td valign="top" style="padding-top: 8px; padding-bottom: 8px">
+{% block content %}{% endblock %}
+</td>
+<td width="12">&nbsp;</td>
+</tr>
+<tr><td colspan="3" bgcolor="#C0C0C0" height="1"><img src="/static/go.gif" width="1" height="1" alt=""></td></tr>
+<tr><td colspan="3" align="center"><font size="1" color="#808080">Ledgerline Credit Union &#149; Internal use only &#149; Build 4.2.117</font></td></tr>
+</table>
+</body>
+</html>

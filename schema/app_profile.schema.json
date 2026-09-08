@@ -1,0 +1,1490 @@
+{
+  "$defs": {
+    "AttrStableLocator": {
+      "additionalProperties": false,
+      "description": "A name/id attribute that passed the recorder's stability heuristic.",
+      "properties": {
+        "attr": {
+          "title": "Attr",
+          "type": "string"
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path (e.g. 'main'); None inherits the Target's frame.",
+          "title": "Frame"
+        },
+        "kind": {
+          "const": "attr_stable",
+          "default": "attr_stable",
+          "title": "Kind",
+          "type": "string"
+        },
+        "robustness": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line note on why this strategy should survive change.",
+          "title": "Robustness"
+        },
+        "surfaces": {
+          "description": "Surface implementations able to evaluate this locator kind.",
+          "items": {
+            "enum": [
+              "web",
+              "web_legacy",
+              "desktop"
+            ],
+            "type": "string"
+          },
+          "title": "Surfaces",
+          "type": "array"
+        },
+        "tag": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tag"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "attr",
+        "value"
+      ],
+      "title": "AttrStableLocator",
+      "type": "object"
+    },
+    "AxPathLocator": {
+      "additionalProperties": false,
+      "description": "Accessibility-tree path for desktop surfaces (designed, not built).",
+      "properties": {
+        "ax_path": {
+          "title": "Ax Path",
+          "type": "string"
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path (e.g. 'main'); None inherits the Target's frame.",
+          "title": "Frame"
+        },
+        "kind": {
+          "const": "ax_path",
+          "default": "ax_path",
+          "title": "Kind",
+          "type": "string"
+        },
+        "robustness": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line note on why this strategy should survive change.",
+          "title": "Robustness"
+        },
+        "surfaces": {
+          "items": {
+            "enum": [
+              "web",
+              "web_legacy",
+              "desktop"
+            ],
+            "type": "string"
+          },
+          "title": "Surfaces",
+          "type": "array"
+        }
+      },
+      "required": [
+        "ax_path"
+      ],
+      "title": "AxPathLocator",
+      "type": "object"
+    },
+    "CoordsVerifiedLocator": {
+      "additionalProperties": false,
+      "description": "Frame-relative coordinates, accepted only if the element under the point carries\n``verify_text``. Never trusted for unattended replay.",
+      "properties": {
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path (e.g. 'main'); None inherits the Target's frame.",
+          "title": "Frame"
+        },
+        "kind": {
+          "const": "coords_verified",
+          "default": "coords_verified",
+          "title": "Kind",
+          "type": "string"
+        },
+        "robustness": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line note on why this strategy should survive change.",
+          "title": "Robustness"
+        },
+        "surfaces": {
+          "items": {
+            "enum": [
+              "web",
+              "web_legacy",
+              "desktop"
+            ],
+            "type": "string"
+          },
+          "title": "Surfaces",
+          "type": "array"
+        },
+        "verify_text": {
+          "default": "",
+          "title": "Verify Text",
+          "type": "string"
+        },
+        "viewport": {
+          "default": [
+            1280,
+            800
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Viewport",
+          "type": "array"
+        },
+        "x": {
+          "title": "X",
+          "type": "integer"
+        },
+        "y": {
+          "title": "Y",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "CoordsVerifiedLocator",
+      "type": "object"
+    },
+    "Extract": {
+      "additionalProperties": false,
+      "properties": {
+        "output": {
+          "title": "Output",
+          "type": "string"
+        },
+        "parse": {
+          "anyOf": [
+            {
+              "enum": [
+                "string",
+                "currency_usd",
+                "int",
+                "decimal",
+                "regex"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Overrides the output's parser.",
+          "title": "Parse"
+        }
+      },
+      "required": [
+        "output"
+      ],
+      "title": "Extract",
+      "type": "object"
+    },
+    "LabelAnchorLocator": {
+      "additionalProperties": false,
+      "description": "Visible label text + geometric relation to the control \u2014 the legacy-table case where\nthere is no <label for>.",
+      "properties": {
+        "control": {
+          "default": "any",
+          "enum": [
+            "text_input",
+            "password",
+            "select",
+            "checkbox",
+            "radio",
+            "button",
+            "any"
+          ],
+          "title": "Control",
+          "type": "string"
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path (e.g. 'main'); None inherits the Target's frame.",
+          "title": "Frame"
+        },
+        "kind": {
+          "const": "label_anchor",
+          "default": "label_anchor",
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "relation": {
+          "default": "same_row_right",
+          "enum": [
+            "same_row_right",
+            "below",
+            "label_for",
+            "preceding"
+          ],
+          "title": "Relation",
+          "type": "string"
+        },
+        "robustness": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line note on why this strategy should survive change.",
+          "title": "Robustness"
+        },
+        "surfaces": {
+          "items": {
+            "enum": [
+              "web",
+              "web_legacy",
+              "desktop"
+            ],
+            "type": "string"
+          },
+          "title": "Surfaces",
+          "type": "array"
+        }
+      },
+      "required": [
+        "label"
+      ],
+      "title": "LabelAnchorLocator",
+      "type": "object"
+    },
+    "Predicate": {
+      "additionalProperties": false,
+      "description": "A single observable condition. Exactly one leaf field, or ``any_of``/``all``.\n\n``{param}`` placeholders inside string leaves are substituted at evaluation time.",
+      "properties": {
+        "LEAVES": {
+          "default": [
+            "text_contains",
+            "text_matches",
+            "url_matches",
+            "title_matches",
+            "http_status",
+            "http_status_gte",
+            "css_exists",
+            "value_equals",
+            "output_present",
+            "dialog_text_matches",
+            "detector",
+            "any_of",
+            "all"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Leaves",
+          "type": "array"
+        },
+        "all": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Predicate"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "All"
+        },
+        "any_of": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Predicate"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Any Of"
+        },
+        "css_exists": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Css Exists"
+        },
+        "detector": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Name of an app-profile detector.",
+          "title": "Detector"
+        },
+        "dialog_text_matches": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dialog Text Matches"
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frame"
+        },
+        "http_status": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Http Status"
+        },
+        "http_status_gte": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Http Status Gte"
+        },
+        "output_present": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Present"
+        },
+        "text_contains": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text Contains"
+        },
+        "text_matches": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text Matches"
+        },
+        "title_matches": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title Matches"
+        },
+        "url_matches": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url Matches"
+        },
+        "value_equals": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "Predicate",
+      "type": "object"
+    },
+    "RecoverableCondition": {
+      "additionalProperties": false,
+      "description": "A known interstitial/dialog/slowness with a declared, bounded remedy.",
+      "properties": {
+        "detect": {
+          "$ref": "#/$defs/Predicate"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "max_times": {
+          "default": 1,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Max Times",
+          "type": "integer"
+        },
+        "remedy": {
+          "$ref": "#/$defs/Remedy"
+        }
+      },
+      "required": [
+        "id",
+        "detect",
+        "remedy"
+      ],
+      "title": "RecoverableCondition",
+      "type": "object"
+    },
+    "Remedy": {
+      "additionalProperties": false,
+      "properties": {
+        "accept": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accept"
+        },
+        "action": {
+          "enum": [
+            "click",
+            "dismiss_dialog",
+            "wait_and_retry",
+            "run_subflow"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "backoff_ms": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Backoff Ms"
+        },
+        "subflow": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subflow"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "then": {
+          "anyOf": [
+            {
+              "enum": [
+                "restart_from_anchor",
+                "continue"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Then"
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "title": "Remedy",
+      "type": "object"
+    },
+    "RoleNameLocator": {
+      "additionalProperties": false,
+      "description": "Accessible role + computed accessible name (Playwright get_by_role).",
+      "properties": {
+        "exact": {
+          "default": true,
+          "title": "Exact",
+          "type": "boolean"
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path (e.g. 'main'); None inherits the Target's frame.",
+          "title": "Frame"
+        },
+        "kind": {
+          "const": "role_name",
+          "default": "role_name",
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "robustness": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line note on why this strategy should survive change.",
+          "title": "Robustness"
+        },
+        "role": {
+          "title": "Role",
+          "type": "string"
+        },
+        "surfaces": {
+          "items": {
+            "enum": [
+              "web",
+              "web_legacy",
+              "desktop"
+            ],
+            "type": "string"
+          },
+          "title": "Surfaces",
+          "type": "array"
+        }
+      },
+      "required": [
+        "role",
+        "name"
+      ],
+      "title": "RoleNameLocator",
+      "type": "object"
+    },
+    "RowMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "title": "Column",
+          "type": "string"
+        },
+        "equals": {
+          "title": "Equals",
+          "type": "string"
+        }
+      },
+      "required": [
+        "column",
+        "equals"
+      ],
+      "title": "RowMatch",
+      "type": "object"
+    },
+    "Step": {
+      "additionalProperties": false,
+      "properties": {
+        "accept": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "For dismiss_dialog.",
+          "title": "Accept"
+        },
+        "action": {
+          "enum": [
+            "click",
+            "type",
+            "select",
+            "press",
+            "navigate",
+            "read",
+            "scroll",
+            "dismiss_dialog",
+            "run_subflow"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "clear_first": {
+          "default": false,
+          "title": "Clear First",
+          "type": "boolean"
+        },
+        "expect": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Predicate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Postcondition = checkpoint."
+        },
+        "extract": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Extract"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "idempotent": {
+          "default": false,
+          "description": "May be re-acted after a timeout. False => re-observe only, then escalate.",
+          "title": "Idempotent",
+          "type": "boolean"
+        },
+        "intent": {
+          "description": "The model's stated reason; kept for reviewers.",
+          "title": "Intent",
+          "type": "string"
+        },
+        "key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "For press: key name, e.g. Enter.",
+          "title": "Key"
+        },
+        "mask_in_evidence": {
+          "default": false,
+          "title": "Mask In Evidence",
+          "type": "boolean"
+        },
+        "on_outcome": {
+          "description": "Business outcomes that may legitimately end here.",
+          "items": {
+            "type": "string"
+          },
+          "title": "On Outcome",
+          "type": "array"
+        },
+        "option": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "For select: visible option label.",
+          "title": "Option"
+        },
+        "risk_class": {
+          "default": "read",
+          "enum": [
+            "read",
+            "reversible_write",
+            "irreversible_write"
+          ],
+          "title": "Risk Class",
+          "type": "string"
+        },
+        "subflow": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "For run_subflow: profile subflow.",
+          "title": "Subflow"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Target"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "For navigate: may contain {param}.",
+          "title": "Url"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "wait_for": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WaitFor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "action",
+        "intent"
+      ],
+      "title": "Step",
+      "type": "object"
+    },
+    "Subflow": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Predicate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "entry_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entry Url"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/Step"
+          },
+          "minItems": 1,
+          "title": "Steps",
+          "type": "array"
+        }
+      },
+      "required": [
+        "steps"
+      ],
+      "title": "Subflow",
+      "type": "object"
+    },
+    "TableCellLocator": {
+      "additionalProperties": false,
+      "description": "Header-name addressed cell: table near ``table_anchor``, row where ``row_match.column``\nequals a value, cell under ``column``. Survives row and column reordering.",
+      "properties": {
+        "column": {
+          "title": "Column",
+          "type": "string"
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path (e.g. 'main'); None inherits the Target's frame.",
+          "title": "Frame"
+        },
+        "kind": {
+          "const": "table_cell",
+          "default": "table_cell",
+          "title": "Kind",
+          "type": "string"
+        },
+        "robustness": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line note on why this strategy should survive change.",
+          "title": "Robustness"
+        },
+        "row_match": {
+          "$ref": "#/$defs/RowMatch"
+        },
+        "surfaces": {
+          "items": {
+            "enum": [
+              "web",
+              "web_legacy",
+              "desktop"
+            ],
+            "type": "string"
+          },
+          "title": "Surfaces",
+          "type": "array"
+        },
+        "table_anchor": {
+          "title": "Table Anchor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "table_anchor",
+        "row_match",
+        "column"
+      ],
+      "title": "TableCellLocator",
+      "type": "object"
+    },
+    "Target": {
+      "additionalProperties": false,
+      "description": "Where a step acts. ``locators`` is ordered; replay records which index resolved.",
+      "properties": {
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path; None = top document.",
+          "title": "Frame"
+        },
+        "locators": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "attr_stable": "#/$defs/AttrStableLocator",
+                "ax_path": "#/$defs/AxPathLocator",
+                "coords_verified": "#/$defs/CoordsVerifiedLocator",
+                "label_anchor": "#/$defs/LabelAnchorLocator",
+                "role_name": "#/$defs/RoleNameLocator",
+                "table_cell": "#/$defs/TableCellLocator",
+                "text_exact": "#/$defs/TextExactLocator",
+                "xpath_anchored": "#/$defs/XPathAnchoredLocator"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/RoleNameLocator"
+              },
+              {
+                "$ref": "#/$defs/LabelAnchorLocator"
+              },
+              {
+                "$ref": "#/$defs/TextExactLocator"
+              },
+              {
+                "$ref": "#/$defs/AttrStableLocator"
+              },
+              {
+                "$ref": "#/$defs/TableCellLocator"
+              },
+              {
+                "$ref": "#/$defs/XPathAnchoredLocator"
+              },
+              {
+                "$ref": "#/$defs/CoordsVerifiedLocator"
+              },
+              {
+                "$ref": "#/$defs/AxPathLocator"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Locators",
+          "type": "array"
+        },
+        "tag_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tag Hint"
+        },
+        "text_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Fingerprint to break ambiguity.",
+          "title": "Text Hint"
+        }
+      },
+      "required": [
+        "locators"
+      ],
+      "title": "Target",
+      "type": "object"
+    },
+    "TextExactLocator": {
+      "additionalProperties": false,
+      "description": "Exact visible text (or alt) optionally constrained to a tag.",
+      "properties": {
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path (e.g. 'main'); None inherits the Target's frame.",
+          "title": "Frame"
+        },
+        "kind": {
+          "const": "text_exact",
+          "default": "text_exact",
+          "title": "Kind",
+          "type": "string"
+        },
+        "robustness": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line note on why this strategy should survive change.",
+          "title": "Robustness"
+        },
+        "surfaces": {
+          "items": {
+            "enum": [
+              "web",
+              "web_legacy",
+              "desktop"
+            ],
+            "type": "string"
+          },
+          "title": "Surfaces",
+          "type": "array"
+        },
+        "tag": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tag"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "TextExactLocator",
+      "type": "object"
+    },
+    "UiFingerprint": {
+      "additionalProperties": false,
+      "properties": {
+        "frame_names": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Frame Names",
+          "type": "array"
+        },
+        "title_pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title Pattern"
+        }
+      },
+      "title": "UiFingerprint",
+      "type": "object"
+    },
+    "ValueRef": {
+      "additionalProperties": false,
+      "description": "Exactly one of ``param`` / ``secret`` / ``literal``.\n\n``param``   -> substituted from the caller's typed params at replay.\n``secret``  -> resolved from the environment by the harness (login routine only); the model\n               never sees it and it is never written anywhere.\n``literal`` -> allowed only for values classified ``none``/``pii_low`` (the emitter\n               canonicalises anything equal to a param value into a ``param`` ref).",
+      "properties": {
+        "literal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Literal"
+        },
+        "param": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Param"
+        },
+        "secret": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Secret"
+        }
+      },
+      "title": "ValueRef",
+      "type": "object"
+    },
+    "WaitFor": {
+      "additionalProperties": false,
+      "properties": {
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frame"
+        },
+        "selector": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Selector"
+        },
+        "state": {
+          "default": "text",
+          "enum": [
+            "navigation",
+            "text",
+            "selector",
+            "url",
+            "none"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        },
+        "timeout_ms": {
+          "default": 5000,
+          "maximum": 120000,
+          "minimum": 100,
+          "title": "Timeout Ms",
+          "type": "integer"
+        },
+        "url_matches": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url Matches"
+        }
+      },
+      "title": "WaitFor",
+      "type": "object"
+    },
+    "XPathAnchoredLocator": {
+      "additionalProperties": false,
+      "description": "XPath relative to an anchor text node. Structural; flags drift when used.",
+      "properties": {
+        "anchor_text": {
+          "title": "Anchor Text",
+          "type": "string"
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Frame path (e.g. 'main'); None inherits the Target's frame.",
+          "title": "Frame"
+        },
+        "kind": {
+          "const": "xpath_anchored",
+          "default": "xpath_anchored",
+          "title": "Kind",
+          "type": "string"
+        },
+        "robustness": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line note on why this strategy should survive change.",
+          "title": "Robustness"
+        },
+        "surfaces": {
+          "description": "Surface implementations able to evaluate this locator kind.",
+          "items": {
+            "enum": [
+              "web",
+              "web_legacy",
+              "desktop"
+            ],
+            "type": "string"
+          },
+          "title": "Surfaces",
+          "type": "array"
+        },
+        "xpath": {
+          "title": "Xpath",
+          "type": "string"
+        }
+      },
+      "required": [
+        "anchor_text",
+        "xpath"
+      ],
+      "title": "XPathAnchoredLocator",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/teller/schema/app_profile.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "``apps/<profile>/profile.yaml`` \u2014 shared by every capability and tenant of a vendor product.",
+  "properties": {
+    "detectors": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Predicate"
+      },
+      "title": "Detectors",
+      "type": "object"
+    },
+    "login": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Subflow"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "product": {
+      "title": "Product",
+      "type": "string"
+    },
+    "profile": {
+      "title": "Profile",
+      "type": "string"
+    },
+    "recoverable_conditions": {
+      "items": {
+        "$ref": "#/$defs/RecoverableCondition"
+      },
+      "title": "Recoverable Conditions",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "sensitive_selectors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Sensitive Selectors",
+      "type": "array"
+    },
+    "ui_fingerprint": {
+      "$ref": "#/$defs/UiFingerprint"
+    }
+  },
+  "required": [
+    "profile",
+    "product"
+  ],
+  "title": "AppProfile",
+  "type": "object"
+}

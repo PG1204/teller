@@ -1,0 +1,20 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="2" cellspacing="0" width="100%">
+<tr><td><font size="3"><b>Welcome, {{ user }}</b></font></td>
+<td align="right">{{ today|legacy_date }}</td></tr>
+<tr><td colspan="2" height="8"></td></tr>
+<tr><td colspan="2"><font size="2"><b>Servicing</b></font></td></tr>
+<tr><td colspan="2" bgcolor="#C0C0C0" height="1"></td></tr>
+<tr><td colspan="2">
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td width="16">&nbsp;</td><td><a href="/console/members/search">Member Search</a></td><td>&nbsp;&nbsp;Locate a member by number or last name.</td></tr>
+<tr><td width="16">&nbsp;</td><td><a href="/console/reports">Reports</a></td><td>&nbsp;&nbsp;Branch reporting.</td></tr>
+</table>
+</td></tr>
+<tr><td colspan="2" height="12"></td></tr>
+<tr><td colspan="2"><font size="2"><b>Announcements</b></font></td></tr>
+<tr><td colspan="2" bgcolor="#C0C0C0" height="1"></td></tr>
+<tr><td colspan="2">Core batch window is 22:00-23:30. Postings after 21:45 settle next business day.</td></tr>
+</table>
+{% endblock %}

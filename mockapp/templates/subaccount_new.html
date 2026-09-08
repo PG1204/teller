@@ -1,0 +1,39 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="2" cellspacing="0">
+<tr><td colspan="4"><font size="3"><b>Open Sub-Account</b></font></td></tr>
+<tr><td colspan="4">Member {{ member.number }} &nbsp;-&nbsp; {{ member.name }}</td></tr>
+<tr><td colspan="4" height="8"></td></tr>
+{% if errors.form %}
+<tr><td colspan="4"><font color="red">{{ errors.form }}</font></td></tr>
+{% endif %}
+<form method="post" action="/console/members/{{ member.number }}/subaccounts/new" name="frmOpen" onsubmit="return confirm('Open this sub-account?')">
+<tr>
+<td align="right">Product</td>
+<td width="6">&nbsp;</td>
+<td><select name="sel3">
+{% for p in products %}<option value="{{ p }}"{% if values.sel3 == p %} selected{% endif %}>{{ p }}</option>
+{% endfor %}</select></td>
+<td>{% if errors.sel3 %}<font color="red">{{ errors.sel3 }}</font>{% endif %}</td>
+</tr>
+<tr>
+<td align="right">Nickname</td>
+<td width="6">&nbsp;</td>
+<td><input type="text" name="txtF7" size="24" maxlength="30" value="{{ values.txtF7 }}"></td>
+<td>{% if errors.txtF7 %}<font color="red">{{ errors.txtF7 }}</font>{% endif %}</td>
+</tr>
+<tr>
+<td align="right">Initial Deposit</td>
+<td width="6">&nbsp;</td>
+<td>$ <input type="text" name="txtF8" size="10" maxlength="12" value="{{ values.txtF8 }}"></td>
+<td>{% if errors.txtF8 %}<font color="red">{{ errors.txtF8 }}</font>{% endif %}</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td width="6">&nbsp;</td>
+<td><input type="submit" name="cmdOpen" value="Open"> <input type="button" name="cmdCancel" value="Cancel" onclick="location.href='/console/members/{{ member.number }}'"></td>
+<td>&nbsp;</td>
+</tr>
+</form>
+</table>
+{% endblock %}

@@ -1,0 +1,28 @@
+# Allowlist + risk classification + redaction for the Ledgerline mock console.
+# Enforced by PolicyGate at the single call site inside Surface.act (discovery AND replay).
+schema_version: 1
+origins: ["http://127.0.0.1:8600"]          # any other origin is refused, including redirects
+routes_allow: ["/", "/login", "/logout", "/console", "/console/**", "/static/**"]
+routes_deny:  ["/__chaos**", "/console/admin/**"]   # deny wins; origin allowlisting alone is not enough
+actions_allow: [click, type, select, press, navigate, read, scroll, dismiss_dialog]
+navigate_allow_new_origins: false
+downloads: false
+popups: close_and_log
+max_steps: 20
+max_run_seconds: 360
+risk:
+  reversible:                                # submissions with a review/confirmation step or an undo path
+    controls: ["(?i)^(open|save|update|continue|submit|sign in)$"]
+    submit_routes: ["/console/members/*/subaccounts/new"]
+  irreversible:                              # money movement, closures, deletions — never performed without a human decision
+    controls: ["(?i)\\b(post|transfer|withdraw|reverse|close account|delete|wire)\\b"]
+    submit_routes: ["/console/members/*/transactions/**"]
+    dialog_text: ["(?i)\\b(post|transfer|cannot be undone)\\b"]
+  explicit_elements: []                      # tenant-listed controls that override the patterns
+redaction:
+  regexes:
+    ssn: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+    card: "\\b\\d{13,19}\\b"
+    account: "\\b\\d{10}\\b"
+    email: "[\\w.+-]+@[\\w-]+\\.[\\w.]+"
+  known_secret_env: [LEDGERLINE_PASS, GEMINI_API_KEY, ANTHROPIC_API_KEY]

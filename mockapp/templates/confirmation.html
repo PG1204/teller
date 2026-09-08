@@ -1,0 +1,17 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="2" cellspacing="0">
+<tr><td colspan="3"><font size="3"><b>Sub-Account Opened</b></font></td></tr>
+<tr><td colspan="3" height="8"></td></tr>
+<tr><td colspan="3"><font color="#006600">The sub-account was opened successfully.</font></td></tr>
+<tr><td colspan="3" height="8"></td></tr>
+<tr><td align="right"><b>Member #</b></td><td width="8">&nbsp;</td><td>{{ member.number }} &nbsp;-&nbsp; {{ member.name }}</td></tr>
+<tr><td align="right"><b>New Account #</b></td><td width="8">&nbsp;</td><td>{{ account.number }}</td></tr>
+<tr><td align="right"><b>Nickname</b></td><td width="8">&nbsp;</td><td>{{ account.nickname }}</td></tr>
+<tr><td align="right"><b>Product</b></td><td width="8">&nbsp;</td><td>{{ account.product }}</td></tr>
+<tr><td align="right"><b>Initial Deposit</b></td><td width="8">&nbsp;</td><td>{{ account.initial_deposit|money }}</td></tr>
+<tr><td align="right"><b>Confirmation ID</b></td><td width="8">&nbsp;</td><td><b>{{ account.confirmation_id }}</b></td></tr>
+<tr><td colspan="3" height="12"></td></tr>
+<tr><td colspan="3"><a href="/console/members/{{ member.number }}">&laquo; Return to Member Detail</a></td></tr>
+</table>
+{% endblock %}

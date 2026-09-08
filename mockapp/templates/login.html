@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+{% block content %}
+<table border="0" cellpadding="0" cellspacing="0" align="center" style="margin-top: 40px">
+<tr><td>
+<table border="1" cellpadding="6" cellspacing="0" bordercolor="#003366" bgcolor="#F4F4F4">
+<tr><td colspan="2" bgcolor="#003366"><font color="#FFFFFF"><b>Sign In</b></font></td></tr>
+{% if error %}
+<tr><td colspan="2"><font color="red">{{ error }}</font></td></tr>
+{% endif %}
+<form method="post" action="/login" name="frmLogin" autocomplete="off">
+<tr>
+<td align="right">User ID</td>
+<td><input type="text" name="txtU" size="20" maxlength="32" value="{{ user_id }}"></td>
+</tr>
+<tr>
+<td align="right">Password</td>
+<td><input type="password" name="txtP" size="20" maxlength="64"></td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td><input type="submit" name="cmdLogin" value="Sign In"></td>
+</tr>
+</form>
+</table>
+</td></tr>
+<tr><td align="center"><font size="1" color="#808080">Authorized personnel only. Activity is monitored.</font></td></tr>
+</table>
+{% endblock %}
