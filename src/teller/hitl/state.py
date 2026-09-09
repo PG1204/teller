@@ -155,9 +155,9 @@ class ControlState:
         if to not in TRANSITIONS[self.state]:
             raise IllegalTransition(f"{self.state} -> {to} is not allowed")
         if to is RunState.HUMAN_IN_CONTROL:
-            self.handoffs += 1
-            if self.handoffs > self.max_handoffs:
+            if self.handoffs + 1 > self.max_handoffs:
                 raise IllegalTransition(f"max_handoffs ({self.max_handoffs}) exceeded")
+            self.handoffs += 1
         t = Transition(
             ts=_now(),
             from_state=self.state,

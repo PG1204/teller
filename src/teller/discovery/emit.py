@@ -58,6 +58,7 @@ class OutputDecl:
     type: str = "string"
     classification: Classification = "none"
     parse: str | None = None
+    regex: str | None = None  # required when parse == "regex"
     description: str = ""
 
 
@@ -214,6 +215,7 @@ def emit_capability(
             type=otype,  # type: ignore[arg-type]
             parse=parse,  # type: ignore[arg-type]
             classification=decl.classification,
+            regex=decl.regex,
             source_step=src,
             description=decl.description,
         )
