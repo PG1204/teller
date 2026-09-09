@@ -220,7 +220,7 @@ def test_chaos_blank_page(client: TestClient) -> None:
     blank = client.get("/console/members/search")
     assert blank.status_code == 200
     assert blank.text.strip() == "<html><body></body></html>"
-    assert "Welcome" in client.get("/console/members/search").text
+    assert "Member Search" in client.get("/console/members/search").text
 
 
 def test_chaos_registry_json_and_reset(client: TestClient) -> None:
