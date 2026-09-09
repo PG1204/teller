@@ -91,8 +91,11 @@ def test_apply_overrides_records_patch(sample_raw: dict[str, Any]) -> None:
 
 def test_load_with_tenant_example_b_relabels_s1(repo_root: Path, fixture_path: Path) -> None:
     cap = ArtifactStore(repo_root).load(fixture_path, "example-b")
-    assert _locator_names(cap, "s1") == ["Member Lookup", "Member Lookup"]
-    assert cap.step("s1").target.text_hint == "Member Lookup"  # type: ignore[union-attr]
+    # locators_prepend: the tenant's relabelled control is tried first, vendor defaults remain
+    names = _locator_names(cap, "s1")
+    assert names[0] == "Member Lookup"
+    assert "Members" in names[1:]
+    assert cap.step("s1").target.text_hint == "Members"  # type: ignore[union-attr]
     assert cap.step("s1").target.frame == "nav"  # type: ignore[union-attr]
     assert set(cap.overrides) == {"steps"}
 

@@ -34,7 +34,7 @@
         "additionalProperties": true,
         "type": "object"
       },
-      "description": "Sparse patches keyed by capability id. Mappings deep-merge; 'steps' is keyed by step id and deep-merges into that step; any list (e.g. locators) is replaced.",
+      "description": "Sparse patches keyed by capability id. Mappings deep-merge; 'steps' is keyed by step id and deep-merges into that step; any list (e.g. locators) is replaced, while target.locators_prepend/locators_append add strategies around the base list.",
       "title": "Overrides",
       "type": "object"
     },

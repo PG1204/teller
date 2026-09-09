@@ -11,6 +11,8 @@ Override semantics (documented in the Tenant model and REPORT §4):
   (the base artifact's step list is never re-ordered by a tenant);
 * any list value (e.g. ``locators``) is *replaced*, not appended — a tenant that relabels a
   control supplies the full locator bundle for it, so the result is reviewable in one place;
+  ``target.locators_prepend`` / ``locators_append`` add strategies while keeping the base ones
+  (a tenant-specific label tried first, the vendor defaults as fallback);
 * the applied patch is recorded on the loaded ``Capability.overrides`` for audit.
 
 Saving enforces the approval rule: if the content hash differs from ``review.artifact_sha256``
@@ -58,6 +60,13 @@ def apply_overrides(raw: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any
         for sid, sp in step_patch.items():
             if sid not in by_id:
                 raise ArtifactError(f"override targets unknown step {sid!r}")
+            sp = copy.deepcopy(sp)
+            tgt = sp.get("target") if isinstance(sp.get("target"), dict) else None
+            base_locs = list((out["steps"][by_id[sid]].get("target") or {}).get("locators") or [])
+            if tgt is not None and ("locators_prepend" in tgt or "locators_append" in tgt):
+                pre = tgt.pop("locators_prepend", []) or []
+                post = tgt.pop("locators_append", []) or []
+                tgt["locators"] = list(pre) + (tgt.get("locators") or base_locs) + list(post)
             out["steps"][by_id[sid]] = _deep_merge(out["steps"][by_id[sid]], sp)
     out["overrides"] = copy.deepcopy(patch)
     return out

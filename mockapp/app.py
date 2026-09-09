@@ -38,7 +38,9 @@ DEPOSIT_RANGE_ERROR = "Initial deposit must be between 0.00 and 10,000.00"
 MAX_DEPOSIT = Decimal("10000.00")
 # Pages that are never replaced by an interstitial/slow/blank fault or given a dialog:
 # the frameset shell and the nav frame (faults must land in the ``main`` frame).
-SHELL_PATHS: frozenset[str] = frozenset({"/console", "/console/nav"})
+# Faults never land on the frameset shell, the nav frame or the landing page: a fault armed before
+# a run fires on the first servicing screen the automation opens, not on the post-login load.
+SHELL_PATHS: frozenset[str] = frozenset({"/console", "/console/nav", "/console/home"})
 # Interstitial pages are not themselves interrupted by another interstitial.
 INTERSTITIAL_EXEMPT: frozenset[str] = SHELL_PATHS | {"/console/notice", "/console/attest"}
 # 1x1 transparent GIF, rendered at 60x22 via width/height attributes.
@@ -172,9 +174,11 @@ async def page_error_handler(request: Request, exc: PageError) -> Response:
 
 def _chaos_response(request: Request) -> Response | None:
     """Fault to serve instead of the real page, if one is armed."""
+    if request.url.path in SHELL_PATHS:
+        return None
     if chaos.consume("app_error"):
         return render(request, "error500.html", status=500)
-    if request.method != "GET" or request.url.path in SHELL_PATHS:
+    if request.method != "GET":
         return None
     ret = requested_url(request)
     if request.url.path not in INTERSTITIAL_EXEMPT:
@@ -199,7 +203,9 @@ async def console_guard(
     session = session_of(request)
     if session is None:
         return RedirectResponse("/login", status_code=302)
-    if session.expired() or chaos.consume("expire_session"):
+    if session.expired():
+        return _expired_redirect()
+    if request.url.path not in SHELL_PATHS and chaos.consume("expire_session"):
         return _expired_redirect()
     request.state.user = session.user
     response = _chaos_response(request)

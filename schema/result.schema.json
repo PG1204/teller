@@ -211,7 +211,8 @@
       "description": "A human made a decision that ended the run. Not a defect, not a business outcome.",
       "enum": [
         "ABORTED_BY_HUMAN",
-        "CONFIRMATION_DECLINED"
+        "CONFIRMATION_DECLINED",
+        "HUMAN_REQUIRED_UNATTENDED"
       ],
       "title": "DeclinedCode",
       "type": "string"

@@ -80,6 +80,7 @@ class DeclinedCode(StrEnum):
 
     ABORTED_BY_HUMAN = "ABORTED_BY_HUMAN"
     CONFIRMATION_DECLINED = "CONFIRMATION_DECLINED"  # irreversible step refused by the operator
+    HUMAN_REQUIRED_UNATTENDED = "HUMAN_REQUIRED_UNATTENDED"  # policy needed a human; --unattended had none
 
 
 class Base(BaseModel):

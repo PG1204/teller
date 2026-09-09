@@ -51,7 +51,7 @@ business_outcomes:
     at_steps: [s4]
   NO_SAVINGS_ACCOUNT:
     description: The member exists but holds no Share Savings account
-    detect: { all: [ { text_contains: "Accounts", frame: main }, { detector: no_share_savings } ] }
+    detect: { all: [ { text_contains: "Member Detail", frame: main }, { none_of: [ { text_contains: "Share Savings", frame: main } ] } ] }
     at_steps: [s5]
 recoverable_conditions:
   - id: compliance_notice

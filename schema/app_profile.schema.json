@@ -448,6 +448,22 @@
           "default": null,
           "title": "Http Status Gte"
         },
+        "none_of": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Predicate"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "True when none of these hold.",
+          "title": "None Of"
+        },
         "output_present": {
           "anyOf": [
             {

@@ -11,7 +11,5 @@ overrides:
     steps:
       s1:
         target:
-          text_hint: "Member Lookup"
-          locators:                          # lists are replaced wholesale, so the override is reviewable in one place
+          locators_prepend:                  # tried first; the vendor defaults stay as fallbacks (plain `locators:` would replace them)
             - { kind: role_name, role: link, name: "Member Lookup", robustness: "tenant relabelled the nav item" }
-            - { kind: text_exact, text: "Member Lookup" }

@@ -273,6 +273,7 @@ class Predicate(Strict):
     detector: str | None = Field(default=None, description="Name of an app-profile detector.")
     any_of: list[Predicate] | None = None
     all: list[Predicate] | None = None
+    none_of: list[Predicate] | None = Field(default=None, description="True when none of these hold.")
 
     LEAVES: ClassVar[tuple[str, ...]] = (
         "text_contains",
@@ -288,6 +289,7 @@ class Predicate(Strict):
         "detector",
         "any_of",
         "all",
+        "none_of",
     )
 
     @model_validator(mode="after")
@@ -306,7 +308,7 @@ class Predicate(Strict):
             v = getattr(self, k)
             if v is None:
                 continue
-            if k in ("any_of", "all"):
+            if k in ("any_of", "all", "none_of"):
                 inner = ", ".join(p.describe() for p in v)
                 return f"{k}({inner})"
             if isinstance(v, ValueRef):
@@ -688,7 +690,8 @@ class Tenant(Strict):
         default_factory=dict,
         description=(
             "Sparse patches keyed by capability id. Mappings deep-merge; 'steps' is keyed by "
-            "step id and deep-merges into that step; any list (e.g. locators) is replaced."
+            "step id and deep-merges into that step; any list (e.g. locators) is replaced, while "
+            "target.locators_prepend/locators_append add strategies around the base list."
         ),
     )
 

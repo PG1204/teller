@@ -150,10 +150,10 @@ def test_chaos_validation_error_is_one_shot(client: TestClient) -> None:
 
 def test_chaos_app_error_and_unknown_interstitial(client: TestClient) -> None:
     arm(client, "app_error")
-    broken = client.get("/console/home")
+    broken = client.get("/console/members/search")
     assert broken.status_code == 500
     assert "ORA-00600" in broken.text
-    assert client.get("/console/home").status_code == 200
+    assert client.get("/console/members/search").status_code == 200
 
     arm(client, "interstitial_unknown")
     gate = client.get("/console/members/search")
@@ -177,13 +177,13 @@ def test_chaos_known_interstitial_and_dialogs(client: TestClient) -> None:
     assert acked.headers["location"] == "/console/members/10001"
 
     arm(client, "dialog_known")
-    assert "alert('Your session will expire in 5 minutes')" in client.get("/console/home").text
-    assert "alert(" not in client.get("/console/home").text
+    assert "alert('Your session will expire in 5 minutes')" in client.get("/console/members/search").text
+    assert "alert(" not in client.get("/console/members/search").text
 
     arm(client, "dialog_unknown", times=2)
-    assert "Ledgerline notice #1: continue with pending batch?" in client.get("/console/home").text
-    assert "Ledgerline notice #2: continue with pending batch?" in client.get("/console/home").text
-    assert "confirm(" not in client.get("/console/home").text
+    assert "Ledgerline notice #1: continue with pending batch?" in client.get("/console/members/search").text
+    assert "Ledgerline notice #2: continue with pending batch?" in client.get("/console/members/search").text
+    assert "confirm(" not in client.get("/console/members/search").text
 
 
 def test_chaos_permission_denied(client: TestClient) -> None:
@@ -194,7 +194,7 @@ def test_chaos_permission_denied(client: TestClient) -> None:
 
 def test_chaos_expire_session(client: TestClient) -> None:
     arm(client, "expire_session")
-    expired = client.get("/console/home")
+    expired = client.get("/console/members/search")
     assert expired.status_code == 302
     assert expired.headers["location"] == "/login?reason=expired"
 
@@ -217,10 +217,10 @@ def test_chaos_slow_then_real_page(client: TestClient) -> None:
 
 def test_chaos_blank_page(client: TestClient) -> None:
     arm(client, "blank_page")
-    blank = client.get("/console/home")
+    blank = client.get("/console/members/search")
     assert blank.status_code == 200
     assert blank.text.strip() == "<html><body></body></html>"
-    assert "Welcome" in client.get("/console/home").text
+    assert "Welcome" in client.get("/console/members/search").text
 
 
 def test_chaos_registry_json_and_reset(client: TestClient) -> None:

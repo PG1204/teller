@@ -33,6 +33,12 @@ from teller.discovery.cli import app as discover_app  # noqa: E402
 
 app.add_typer(discover_app, name="discover", help="LLM-driven discovery run -> draft capability + evidence.")
 
+from teller.replay.cli import evidence_app, policy_app, replay_app  # noqa: E402
+
+app.add_typer(replay_app, name="replay", help="Deterministic, model-free replay of a capability.")
+app.add_typer(policy_app, name="policy")
+app.add_typer(evidence_app, name="evidence")
+
 load_dotenv()
 
 REPO = Path(__file__).resolve().parents[2]

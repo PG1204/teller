@@ -42,6 +42,8 @@ def evaluate(pred: Predicate, obs: Observation, ctx: EvalContext) -> bool:
         return all(evaluate(q, obs, ctx) for q in pred.all)
     if pred.any_of is not None:
         return any(evaluate(q, obs, ctx) for q in pred.any_of)
+    if pred.none_of is not None:
+        return not any(evaluate(q, obs, ctx) for q in pred.none_of)
     if pred.detector is not None:
         det = ctx.detectors.get(pred.detector)
         if det is None:
@@ -103,7 +105,7 @@ def css_selectors(preds: list[Predicate]) -> list[str]:
     def walk(p: Predicate) -> None:
         if p.css_exists:
             out.append(p.css_exists)
-        for q in (p.all or []) + (p.any_of or []):
+        for q in (p.all or []) + (p.any_of or []) + (p.none_of or []):
             walk(q)
 
     for p in preds:

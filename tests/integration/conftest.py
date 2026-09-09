@@ -60,10 +60,10 @@ def workdir(tmp_path: Path, mock_url: str) -> Path:
                 rel = f.relative_to(src)
                 (dst / rel).parent.mkdir(parents=True, exist_ok=True)
                 (dst / rel).write_bytes(f.read_bytes())
-    tp = tmp_path / "tenants" / "local.yaml"
-    data = yaml.safe_load(tp.read_text())
-    data["base_url"] = mock_url
-    tp.write_text(yaml.safe_dump(data))
+    for tp in (tmp_path / "tenants").glob("*.yaml"):
+        data = yaml.safe_load(tp.read_text())
+        data["base_url"] = mock_url
+        tp.write_text(yaml.safe_dump(data))
     pol = tmp_path / "policies" / "ledgerline.yaml"
     pdata = yaml.safe_load(pol.read_text())
     pdata["origins"] = [mock_url]
