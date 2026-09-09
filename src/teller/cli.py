@@ -158,6 +158,30 @@ def chaos_show(tenant: str = typer.Option("local", "--tenant")) -> None:
 
 
 @app.command()
+def approve(
+    artifact: Path = typer.Argument(..., help="capabilities/<id>@<version>.yaml"),
+    by: str = typer.Option(..., "--by", help="Reviewer name recorded in the artifact."),
+) -> None:
+    """Stretch: mark a reviewed capability approved (pinned to its content hash) so it may run --unattended.
+
+    Any later edit to the flow reverts the status to draft on save."""
+    from teller.artifact.store import ArtifactError, load_capability, save_capability
+    from teller.artifact.store import approve as _approve
+
+    try:
+        cap = load_capability(artifact)
+    except ArtifactError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(code=2) from e
+    if not cap.business_outcomes:
+        typer.echo("refusing: no business_outcomes declared — review the artifact first", err=True)
+        raise typer.Exit(code=1)
+    approved = _approve(cap, by)
+    out = save_capability(approved, artifact.parent)
+    typer.echo(f"approved {approved.file_stem()} by {by} sha={approved.capability.review.artifact_sha256[:12]} -> {out}")
+
+
+@app.command()
 def version() -> None:
     from teller import __version__
 
