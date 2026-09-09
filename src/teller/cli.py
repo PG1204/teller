@@ -39,6 +39,10 @@ app.add_typer(replay_app, name="replay", help="Deterministic, model-free replay 
 app.add_typer(policy_app, name="policy")
 app.add_typer(evidence_app, name="evidence")
 
+from teller.hitl.cli import app as intervene_app  # noqa: E402
+
+app.add_typer(intervene_app, name="intervene")
+
 load_dotenv()
 
 REPO = Path(__file__).resolve().parents[2]

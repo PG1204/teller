@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>teller · operator console</title>
+<style>
+  body { font: 13px/1.4 -apple-system, Segoe UI, Helvetica, Arial, sans-serif; margin: 0; background: #f4f6f8; color: #111; }
+  header { background: #003366; color: #fff; padding: 10px 16px; display: flex; gap: 16px; align-items: center; }
+  header b { font-size: 15px; }
+  .badge { padding: 2px 8px; border-radius: 10px; font-weight: 600; font-size: 12px; }
+  .automation { background: #2e7d32; color: #fff; } .human { background: #ef6c00; color: #fff; } .none { background: #9e9e9e; color: #fff; }
+  main { display: grid; grid-template-columns: 1fr 420px; gap: 16px; padding: 16px; }
+  .card { background: #fff; border: 1px solid #d0d7de; border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; }
+  h2 { font-size: 13px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .04em; color: #555; }
+  dl { display: grid; grid-template-columns: 120px 1fr; gap: 4px 10px; margin: 0; } dt { color: #666; } dd { margin: 0; word-break: break-word; }
+  img#shot { width: 100%; border: 1px solid #ccc; background: #fff; }
+  button { padding: 7px 12px; border: 1px solid #003366; background: #fff; color: #003366; border-radius: 4px; cursor: pointer; font-weight: 600; margin: 4px 4px 4px 0; }
+  button.primary { background: #003366; color: #fff; } button.danger { border-color: #b71c1c; color: #b71c1c; } button:disabled { opacity: .4; cursor: default; }
+  input, select { padding: 6px; border: 1px solid #bbb; border-radius: 4px; width: 100%; box-sizing: border-box; margin-bottom: 6px; }
+  pre { background: #0b1020; color: #cfe3ff; padding: 8px; border-radius: 4px; font-size: 11px; max-height: 220px; overflow: auto; }
+  .hint { color: #666; font-size: 12px; }
+</style>
+</head>
+<body>
+<header><b>teller · operator console</b> <span id="state" class="badge none">…</span> <span id="ctl" class="hint"></span></header>
+<main>
+  <section>
+    <div class="card"><h2>Live session</h2>
+      <p class="hint">The automation paused on the <b>same</b> browser window it was driving (headed Chromium). Perform the manual step there, then resume below. <span id="cdp"></span></p>
+      <img id="shot" src="/screenshot" alt="live screenshot">
+    </div>
+    <div class="card"><h2>Recent events</h2><pre id="events">…</pre></div>
+  </section>
+  <aside>
+    <div class="card"><h2>Intervention</h2><dl id="req"></dl></div>
+    <div class="card"><h2>Control</h2>
+      <label class="hint">Operator</label><input id="operator" value="operator">
+      <div id="claimBox"><button class="primary" onclick="send('claim')">Claim control</button></div>
+      <div id="resumeBox" style="display:none">
+        <label class="hint">Note (recorded)</label><input id="note" placeholder="what you did">
+        <label class="hint">Resume mode</label>
+        <select id="mode"><option value="retry_step">retry_step — run the current step again</option><option value="skip_step">skip_step — I performed the step; verify and continue</option><option value="complete">complete — I finished the flow; verify the checkpoint</option></select>
+        <button class="primary" onclick="send('resume')">Hand control back</button>
+        <button onclick="send('confirm')">Confirm irreversible step</button>
+        <button class="danger" onclick="send('decline')">Decline</button>
+        <button class="danger" onclick="send('abort')">Abort run</button>
+        <div class="hint" style="margin-top:6px">Dialog stuck? <button onclick="send('dialog_accept')">Accept dialog</button> <button onclick="send('dialog_dismiss')">Dismiss dialog</button></div>
+      </div>
+      <pre id="log" style="max-height:120px"></pre>
+    </div>
+  </aside>
+</main>
+<script>
+let current = null;
+async function refresh() {
+  try {
+    const r = await fetch('/interventions/current.json'); const d = await r.json();
+    current = d.intervention || {};
+    const st = d.state || {};
+    const badge = document.getElementById('state'); badge.textContent = st.state || '—';
+    badge.className = 'badge ' + (st.controller || 'none');
+    document.getElementById('ctl').textContent = 'controller: ' + (st.controller || '—') + ' · handoffs: ' + (st.handoffs ?? 0);
+    const dl = document.getElementById('req'); dl.innerHTML = '';
+    for (const k of ['intervention_id','run_id','mode','capability_id','goal','step_id','intent','trigger','reason','url','claimed_by','deadline','resolution']) {
+      if (current[k] === undefined || current[k] === null) continue;
+      dl.insertAdjacentHTML('beforeend', `<dt>${k}</dt><dd>${String(current[k])}</dd>`);
+    }
+    document.getElementById('cdp').textContent = current.session_endpoint ? ('CDP: ' + current.session_endpoint) : '';
+    const claimed = !!current.claimed_by && !current.released_at;
+    document.getElementById('claimBox').style.display = claimed ? 'none' : '';
+    document.getElementById('resumeBox').style.display = claimed ? '' : 'none';
+    document.getElementById('shot').src = '/screenshot?t=' + Date.now();
+    const ev = await (await fetch('/events')).json();
+    document.getElementById('events').textContent = ev.map(e => `${e.ts.slice(11,19)} ${e.type.padEnd(18)} ${e.step_id||'-'} ${JSON.stringify(e.payload).slice(0,140)}`).join('\n');
+  } catch (e) { document.getElementById('log').textContent = 'refresh failed: ' + e; }
+}
+async function send(command) {
+  if (!current || !current.intervention_id) return;
+  const body = { operator: document.getElementById('operator').value, note: document.getElementById('note').value };
+  if (command === 'resume') body.mode = document.getElementById('mode').value;
+  const r = await fetch(`/interventions/${current.intervention_id}/${command}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+  document.getElementById('log').textContent = `${r.status} ${command}: ` + await r.text();
+  setTimeout(refresh, 400);
+}
+refresh(); setInterval(refresh, 2000);
+</script>
+</body>
+</html>
