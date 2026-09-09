@@ -29,6 +29,10 @@ chaos_app = typer.Typer(no_args_is_help=True, help="Arm one-shot faults in the m
 app.add_typer(schema_app, name="schema")
 app.add_typer(chaos_app, name="chaos")
 
+from teller.discovery.cli import app as discover_app  # noqa: E402
+
+app.add_typer(discover_app, name="discover", help="LLM-driven discovery run -> draft capability + evidence.")
+
 load_dotenv()
 
 REPO = Path(__file__).resolve().parents[2]

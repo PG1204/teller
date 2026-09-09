@@ -21,10 +21,12 @@
   const short = (s, n) => { s = norm(s); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
 
   // ------------------------------------------------------------------ clear
-  const clear = () => {
+  const clear = (keepMarks) => {
     doc.querySelectorAll("[data-teller-badge]").forEach((b) => b.remove());
-    doc.querySelectorAll("[data-teller-idx]").forEach((e) => e.removeAttribute("data-teller-idx"));
-    doc.querySelectorAll("[data-teller-mark]").forEach((e) => e.removeAttribute("data-teller-mark"));
+    if (!keepMarks) {
+      doc.querySelectorAll("[data-teller-idx]").forEach((e) => e.removeAttribute("data-teller-idx"));
+      doc.querySelectorAll("[data-teller-mark]").forEach((e) => e.removeAttribute("data-teller-mark"));
+    }
     doc.querySelectorAll("span[data-teller-mask]").forEach((s) => {
       const parent = s.parentNode;
       if (!parent) return;
@@ -33,7 +35,7 @@
       parent.normalize && parent.normalize();
     });
   };
-  if (phase === "clear") { clear(); return { cleared: true }; }
+  if (phase === "clear") { clear(!!opts.keepMarks); return { cleared: true }; }
   if (!body) return { elements: [], text: "", offscreen: 0, frameset: !!doc.querySelector("frameset") };
 
   // ------------------------------------------------------------------ badge
@@ -60,7 +62,7 @@
   }
 
   // ------------------------------------------------------------------ collect
-  clear();
+  clear(false);
 
   // 1) wrap sensitive text nodes so the screenshot can mask them by selector
   const regexes = (opts.maskRegexes || []).map((r) => { try { return new RegExp(r, "g"); } catch (e) { return null; } }).filter(Boolean);
@@ -252,7 +254,7 @@
     const tr = cell.parentElement; if (!tr || tr === hr) return { anchor: tableAnchor(table), header: norm(cell.innerText), row_key_header: null, row_key: null, is_header: true };
     const idx = cellIndex(cell);
     const first = tr.cells[0];
-    return { anchor: tableAnchor(table), header: names[idx] || null, row_key_header: names[0] || null, row_key: first ? short(norm(first.innerText), 40) : null, is_header: false };
+    return { anchor: tableAnchor(table), header: names[idx] || null, row_key_header: names[0] || null, row_key: first ? short(norm(first.innerText), 40) : null, is_header: false, col: idx + 1 };
   };
 
   const stableAttr = (el) => {
@@ -331,5 +333,6 @@
       is_submit: isSubmit(el),
     });
   }
-  return { elements: out, text: norm(body.innerText || ""), offscreen, frameset: false };
+  const visibleText = (body.innerText || "").replace(/[ \t\u00a0]+/g, " ").replace(/\s*\n\s*/g, "\n").trim();
+  return { elements: out, text: visibleText, offscreen, frameset: false };
 }

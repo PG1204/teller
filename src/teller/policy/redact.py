@@ -123,6 +123,14 @@ class Redactor:
                 out[k] = v
         return out
 
+    def masked_params_raw(self, params: dict[str, str], decls: dict[str, Any]) -> dict[str, str]:
+        """Mask by classification when only declarations (not a Capability) are available."""
+        out: dict[str, str] = {}
+        for k, v in params.items():
+            cls = getattr(decls.get(k), "classification", "none") if decls else "none"
+            out[k] = "<secret>" if cls == "secret" else mask_last4(v) if cls == "pii_high" else v
+        return out
+
     def masked_outputs(self, cap: Capability, outputs: dict[str, str]) -> dict[str, str]:
         out: dict[str, str] = {}
         for k, v in outputs.items():

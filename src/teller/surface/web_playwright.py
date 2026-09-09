@@ -382,7 +382,7 @@ class WebPlaywrightSurface:
         finally:
             for _path, frame, _res in collected:
                 try:
-                    frame.evaluate(MARKS_JS, {"phase": "clear"})
+                    frame.evaluate(MARKS_JS, {"phase": "clear", "keepMarks": True})
                 except PlaywrightError:  # pragma: no cover
                     pass
 
@@ -550,6 +550,20 @@ class WebPlaywrightSurface:
         if not count:
             return None
         return frame.locator(f'[data-teller-resolve="{token}"]')
+
+    def resolve_mark(self, element: Element) -> Resolution:
+        """Resolve an element the model chose by mark id (valid until the next observe)."""
+        frame = self._frame(element.frame)
+        if frame is None:
+            return Resolution(handle=None, frame=element.frame, failure="frame_missing",
+                              diagnostics=[{"kind": "mark", "matched": 0, "note": "frame missing"}])
+        loc = frame.locator(f'[data-teller-mark="{element.mark_id}"]')
+        visible = self._visible_indices(loc)
+        if len(visible) != 1:
+            return Resolution(handle=None, frame=element.frame, failure="not_found",
+                              diagnostics=[{"kind": "mark", "matched": len(visible), "note": "mark stale; re-observe"}])
+        return Resolution(handle=loc.nth(visible[0]), frame=element.frame, index_used=0, kind="mark",
+                          element=element, diagnostics=[{"kind": "mark", "matched": 1, "note": "resolved by mark id"}])
 
     def _element_from_handle(self, handle: Locator, frame_path: str) -> Element | None:
         try:
