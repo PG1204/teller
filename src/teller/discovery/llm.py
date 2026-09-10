@@ -67,6 +67,17 @@ def obs_hash(observation_text: str) -> str:
     return hashlib.sha256(observation_text.encode()).hexdigest()[:16]
 
 
+def _retry_delay_from(err: Exception) -> float | None:
+    """Honour the server's RetryInfo ('Please retry in 59.3s' / retryDelay: '59s') when present."""
+    import re
+
+    text = str(err)
+    m = re.search(r"retry in ([0-9.]+)s", text) or re.search(r"retryDelay['\"]?\s*[:=]\s*['\"]?([0-9.]+)s", text)
+    if m:
+        return float(m.group(1)) + 1.0
+    return None
+
+
 # ---------------------------------------------------------------------------------------------
 # Provider-neutral transcript kept by every decider (images replaced by file refs by the caller)
 # ---------------------------------------------------------------------------------------------
@@ -111,7 +122,8 @@ class GeminiDecider:
         api_key: str | None = None,
         thinking_level: str = "HIGH",
         keep_images: int = 2,
-        max_retries: int = 3,
+        max_retries: int = 6,
+        requests_per_minute: float | None = None,
     ):
         from google import genai
 
@@ -128,6 +140,10 @@ class GeminiDecider:
         self._tools: list[ToolSpec] = []
         self._t = _Transcript()
         self._pending_call_name: str | None = None
+        # free tier is 5 requests/minute on Flash: pace calls instead of tripping 429s
+        rpm = requests_per_minute or float(os.environ.get("TELLER_GEMINI_RPM", "5"))
+        self._min_interval = (60.0 / rpm) + 0.5 if rpm > 0 else 0.0
+        self._last_call = 0.0
 
     def start(self, system_prompt: str, tools: list[ToolSpec], first_user_text: str) -> None:
         from google.genai import types
@@ -139,13 +155,19 @@ class GeminiDecider:
             )
             for t in tools
         ]
+        thinking = (
+            types.ThinkingConfig(thinking_level=self._thinking_level)
+            if self.model.startswith("gemini-3")
+            else None  # 2.5-era models take thinking_budget; their default is fine here
+        )
         self._config = types.GenerateContentConfig(
             system_instruction=system_prompt,
             tools=[types.Tool(function_declarations=decls)],
             tool_config=types.ToolConfig(
                 function_calling_config=types.FunctionCallingConfig(mode="ANY")
             ),
-            thinking_config=types.ThinkingConfig(thinking_level=self._thinking_level),
+            thinking_config=thinking,
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
             temperature=0.0,
             max_output_tokens=4096,
         )
@@ -199,17 +221,25 @@ class GeminiDecider:
 
         last_err: Exception | None = None
         for attempt in range(self._max_retries):
+            wait = self._min_interval - (time.monotonic() - self._last_call)
+            if wait > 0:
+                time.sleep(wait)
             t0 = time.monotonic()
             try:
                 resp = self._client.models.generate_content(
                     model=self.model, contents=self._contents, config=self._config
                 )
+                self._last_call = time.monotonic()
                 break
             except errors.APIError as e:  # 429 / 5xx: back off; 4xx other: raise
                 last_err = e
+                self._last_call = time.monotonic()
                 code = getattr(e, "code", None)
                 if code in (429, 500, 502, 503, 504) and attempt < self._max_retries - 1:
-                    delay = 5 * (attempt + 1)
+                    delay = _retry_delay_from(e) or (5 * (attempt + 1))
+                    if code == 429:
+                        delay = max(delay, 30)
+                    delay = min(delay, 120)
                     log.warning("gemini %s; retrying in %ss", code, delay)
                     time.sleep(delay)
                     continue

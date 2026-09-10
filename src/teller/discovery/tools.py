@@ -120,8 +120,14 @@ TOOLS: list[ToolSpec] = [
     ),
     ToolSpec(
         "done",
-        "The goal is complete and every requested output has been recorded with read_value.",
-        {"summary": {"type": "string"}, "intent": INTENT},
+        "The goal is complete and every requested output has been recorded with read_value. "
+        "Pass checkpoint_text: exact text visible on the final screen that proves you are on the "
+        "right screen (e.g. its heading) — this replaces a separate assert_checkpoint call.",
+        {
+            "summary": {"type": "string"},
+            "checkpoint_text": {"type": "string", "description": "Visible text on the final screen."},
+            "intent": INTENT,
+        },
         ["summary", "intent"],
     ),
 ]

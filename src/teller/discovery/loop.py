@@ -265,6 +265,16 @@ class DiscoveryRunner:
                 if missing:
                     feedback = ToolFeedback("done", False, f"Not done: outputs {missing} have not been recorded with read_value.")
                     continue
+                cp_text = str(args.get("checkpoint_text") or "").strip()
+                if cp_text:
+                    frame = "main" if "main" in obs.frames else None
+                    visible = (obs.visible_text.get(frame or "", "") if frame else obs.text_of()).lower()
+                    if cp_text.lower() in visible:
+                        self.recorder.add_checkpoint(cp_text, frame)
+                        self.log.emit("checkpoint", {"text_contains": cp_text, "frame": frame, "ok": True})
+                    else:
+                        feedback = ToolFeedback("done", False, f"checkpoint_text {cp_text!r} is not visible on the current screen; use text that is.")
+                        continue
                 return self._finish_success(obs, str(args.get("summary", "")))
             if decision.tool == "assert_checkpoint":
                 text = str(args["text_contains"])

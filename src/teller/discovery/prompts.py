@@ -30,8 +30,9 @@ Reading data
 snake_case output_name (e.g. savings_balance, savings_account_number). Read every requested value.
 - Cells shown as <account>, <ssn> or SENSITIVE are masked from you on purpose; you may still \
 read_value them by mark id, and the system will capture the real value securely.
-- Before calling done, call assert_checkpoint with a piece of text that is visible on the final \
-screen and proves you reached the right place (for example the screen heading).
+- When every value is recorded, call done with checkpoint_text set to a piece of text that is \
+visible on the final screen and proves you reached the right place (for example the screen heading). \
+Do not spend a separate turn on assert_checkpoint unless you need to check several texts.
 
 Safety
 - Never perform an action that posts a transaction, moves money, closes or deletes anything, or \
