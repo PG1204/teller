@@ -91,10 +91,11 @@ ELEMENT_INFO_JS = """
 """
 
 DOM_SNAPSHOT_JS = """
-() => {
+(sensitive) => {
   const root = document.documentElement.cloneNode(true);
   root.querySelectorAll("input,textarea").forEach((i) => { i.removeAttribute("value"); i.textContent = ""; });
   root.querySelectorAll("[data-teller-mask]").forEach((s) => { s.textContent = "****"; });
+  for (const sel of sensitive || []) { try { root.querySelectorAll(sel).forEach((n) => { n.textContent = "****"; }); } catch (e) {} }
   root.querySelectorAll("[data-teller-badge]").forEach((b) => b.remove());
   root.querySelectorAll("script").forEach((s) => s.remove());
   return root.outerHTML;
@@ -161,6 +162,7 @@ class WebPlaywrightSurface:
         self._recorder_sink: Callable[[dict[str, Any]], None] | None = None
         self._popups_closed = 0
         self.probe_selectors: list[str] = []  # css_exists predicates evaluated on every observe
+        self.last_mask_count = 0
 
     # ------------------------------------------------------------------ lifecycle
 
@@ -425,15 +427,38 @@ class WebPlaywrightSurface:
                     continue
         return masks
 
+    def _wrap_sensitive_text(self) -> None:
+        """Wrap regex/literal-matching text nodes in every frame so ``mask=`` can black them out.
+
+        Called on every persisted screenshot, not only inside observe(): replay's step screenshots
+        must be masked exactly like the model's view. Idempotent (nodes already wrapped are skipped).
+        """
+        opts = {
+            "phase": "mask",
+            "maskRegexes": self.redactor.text_regexes(),
+            "maskLiterals": self.redactor.sensitive_literals(),
+        }
+        total = 0
+        for _path, frame in self._frames():
+            try:
+                res = frame.evaluate(MARKS_JS, opts)
+                total += int((res or {}).get("masked", 0))
+            except PlaywrightError:
+                continue
+        self.last_mask_count = total  # inspected by tests: >0 whenever sensitive text is on screen
+
     def _screenshot_bytes(self, *, redact: bool = True, quality: int = 70) -> bytes:
         kwargs: dict[str, Any] = {"type": "jpeg", "quality": quality, "full_page": False}
         if redact:
+            if self._dialog_info is None:  # JS is blocked while a dialog is parked
+                self._wrap_sensitive_text()
             kwargs["mask"] = self._mask_locators()
             kwargs["mask_color"] = "#000000"
         try:
             return self.page.screenshot(**kwargs)
         except PlaywrightError as e:
-            log.warning("masked screenshot failed (%s); retrying without frame masks", e)
+            log.warning("masked screenshot failed (%s); retrying with top-level masks only", e)
+            self._on_event("warning", {"code": "MASK_DEGRADED", "error": str(e)[:200]})
             kwargs["mask"] = [self.page.locator(s) for s in self.redactor.mask_selectors()]
             return self.page.screenshot(**kwargs)
 
@@ -448,7 +473,8 @@ class WebPlaywrightSurface:
         parts: list[str] = []
         for fp, frame in self._frames():
             try:
-                html = frame.evaluate(DOM_SNAPSHOT_JS)
+                self._wrap_sensitive_text()
+                html = frame.evaluate(DOM_SNAPSHOT_JS, [x for x in self.redactor.mask_selectors() if x != "[data-teller-mask]"])
             except PlaywrightError as e:
                 html = f"<!-- snapshot failed: {e} -->"
             parts.append(f"<!-- frame: {fp or 'top'} url: {frame.url} -->\n{html}\n")
@@ -776,7 +802,7 @@ class WebPlaywrightSurface:
     # ------------------------------------------------------------------ handoff support
 
     def inject_recorder(self, sink: Callable[[dict[str, Any]], None]) -> None:
-        """Capture the human's actions during a handoff (recorder.js, P4)."""
+        """Capture the human's actions during a handoff (recorder.js)."""
         from teller.surface.recorder import RECORDER_JS
 
         self._recorder_sink = sink

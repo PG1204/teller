@@ -56,6 +56,8 @@ class Element(BaseModel):
         bits = [f"[{self.mark_id}]", self.role]
         if self.name:
             bits.append(repr(self.name[:max_text]))
+        elif self.sensitive:
+            bits.append("'<masked>'")
         if self.text and self.text != self.name:
             bits.append(f"text={self.text[:max_text]!r}")
         if self.label and self.label != self.name:

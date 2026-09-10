@@ -42,8 +42,8 @@
         <label class="hint">Resume mode</label>
         <select id="mode"><option value="retry_step">retry_step — run the current step again</option><option value="skip_step">skip_step — I performed the step; verify and continue</option><option value="complete">complete — I finished the flow; verify the checkpoint</option></select>
         <button class="primary" onclick="send('resume')">Hand control back</button>
-        <button onclick="send('confirm')">Confirm irreversible step</button>
-        <button class="danger" onclick="send('decline')">Decline</button>
+        <button id="btnConfirm" onclick="send('confirm')">Confirm irreversible step</button>
+        <button id="btnDecline" class="danger" onclick="send('decline')">Decline</button>
         <button class="danger" onclick="send('abort')">Abort run</button>
         <div class="hint" style="margin-top:6px">Dialog stuck? <button onclick="send('dialog_accept')">Accept dialog</button> <button onclick="send('dialog_dismiss')">Dismiss dialog</button></div>
       </div>
@@ -64,12 +64,17 @@ async function refresh() {
     const dl = document.getElementById('req'); dl.innerHTML = '';
     for (const k of ['intervention_id','run_id','mode','capability_id','goal','step_id','intent','trigger','reason','url','claimed_by','deadline','resolution']) {
       if (current[k] === undefined || current[k] === null) continue;
-      dl.insertAdjacentHTML('beforeend', `<dt>${k}</dt><dd>${String(current[k])}</dd>`);
+      const dt = document.createElement('dt'); dt.textContent = k;
+      const dd = document.createElement('dd'); dd.textContent = String(current[k]);  // page-derived text: never innerHTML
+      dl.append(dt, dd);
     }
     document.getElementById('cdp').textContent = current.session_endpoint ? ('CDP: ' + current.session_endpoint) : '';
     const claimed = !!current.claimed_by && !current.released_at;
     document.getElementById('claimBox').style.display = claimed ? 'none' : '';
     document.getElementById('resumeBox').style.display = claimed ? '' : 'none';
+    const allowed = current.allowed_resolutions || [];
+    for (const opt of document.getElementById('mode').options) opt.disabled = allowed.length > 0 && !allowed.includes(opt.value);
+    for (const [cmd, id] of [['confirm', 'btnConfirm'], ['decline', 'btnDecline']]) { const b = document.getElementById(id); if (b) b.style.display = allowed.includes(cmd) ? '' : 'none'; }
     if (!claimed) {
       // swap the preview only once the new frame has loaded, so it never flashes blank;
       // once a human holds the session they are looking at the real window, so stop refreshing

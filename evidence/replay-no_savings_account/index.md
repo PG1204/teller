@@ -5,8 +5,8 @@ Member exists but holds no Share Savings: BUSINESS_OUTCOME NO_SAVINGS_ACCOUNT at
 ## Result
 
 - **status**: `business_outcome`
-- **mode**: replay  ·  **run**: `rep_2026-09-10T05-54-47_e9f9`  ·  **llm_invoked**: False
-- **capability**: `ledgerline.member.read_savings_balance@1.0.0` (draft)
+- **mode**: replay  ·  **run**: `rep_2026-09-10T22-43-11_f063`  ·  **llm_invoked**: False
+- **capability**: `ledgerline.member.read_savings_balance@1.0.0` (approved)
 - **params**: `{"member_id": "10004"}`
 - **business outcome**: `NO_SAVINGS_ACCOUNT` at `s5` — The member exists but holds no Share Savings account
 
@@ -14,10 +14,10 @@ Member exists but holds no Share Savings: BUSINESS_OUTCOME NO_SAVINGS_ACCOUNT at
 
 | step | status | locator | index | ms | screenshot |
 |---|---|---|---|---|---|
-| s1 | ok | role_name | 0 | 197 | [s1_after.jpg](screenshots/s1_after.jpg) |
-| s2 | ok | label_anchor | 0 | 166 | [s2_after.jpg](screenshots/s2_after.jpg) |
-| s3 | ok | role_name | 0 | 183 | [s3_after.jpg](screenshots/s3_after.jpg) |
-| s4 | ok | text_exact | 0 | 199 | [s4_after.jpg](screenshots/s4_after.jpg) |
+| s1 | ok | role_name | 0 | 160 | [s1_after.jpg](screenshots/s1_after.jpg) |
+| s2 | ok | label_anchor | 0 | 99 | [s2_after.jpg](screenshots/s2_after.jpg) |
+| s3 | ok | role_name | 0 | 133 | [s3_after.jpg](screenshots/s3_after.jpg) |
+| s4 | ok | text_exact | 0 | 148 | [s4_after.jpg](screenshots/s4_after.jpg) |
 
 ## Screenshots
 

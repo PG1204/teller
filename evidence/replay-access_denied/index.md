@@ -5,8 +5,8 @@ HTTP 403 at s4 is declared as BUSINESS_OUTCOME ACCESS_DENIED; the same detector 
 ## Result
 
 - **status**: `business_outcome`
-- **mode**: replay  ·  **run**: `rep_2026-09-10T05-54-45_7e05`  ·  **llm_invoked**: False
-- **capability**: `ledgerline.member.read_savings_balance@1.0.0` (draft)
+- **mode**: replay  ·  **run**: `rep_2026-09-10T22-43-09_0695`  ·  **llm_invoked**: False
+- **capability**: `ledgerline.member.read_savings_balance@1.0.0` (approved)
 - **params**: `{"member_id": "30003"}`
 - **business outcome**: `ACCESS_DENIED` at `s4` — The operator may not view this member (restricted branch)
 
@@ -14,9 +14,9 @@ HTTP 403 at s4 is declared as BUSINESS_OUTCOME ACCESS_DENIED; the same detector 
 
 | step | status | locator | index | ms | screenshot |
 |---|---|---|---|---|---|
-| s1 | ok | role_name | 0 | 197 | [s1_after.jpg](screenshots/s1_after.jpg) |
-| s2 | ok | label_anchor | 0 | 166 | [s2_after.jpg](screenshots/s2_after.jpg) |
-| s3 | ok | role_name | 0 | 183 | [s3_after.jpg](screenshots/s3_after.jpg) |
+| s1 | ok | role_name | 0 | 159 | [s1_after.jpg](screenshots/s1_after.jpg) |
+| s2 | ok | label_anchor | 0 | 100 | [s2_after.jpg](screenshots/s2_after.jpg) |
+| s3 | ok | role_name | 0 | 132 | [s3_after.jpg](screenshots/s3_after.jpg) |
 
 ## Screenshots
 

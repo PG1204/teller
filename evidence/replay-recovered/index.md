@@ -5,8 +5,8 @@ Two declared, bounded recoveries in one run: Compliance Notice acknowledged (INT
 ## Result
 
 - **status**: `success`
-- **mode**: replay  ·  **run**: `rep_2026-09-10T05-54-51_51c2`  ·  **llm_invoked**: False
-- **capability**: `ledgerline.member.read_savings_balance@1.0.0` (draft)
+- **mode**: replay  ·  **run**: `rep_2026-09-10T22-43-14_65c6`  ·  **llm_invoked**: False
+- **capability**: `ledgerline.member.read_savings_balance@1.0.0` (approved)
 - **params**: `{"member_id": "10001"}`
 - **outputs**: `{"savings_account_number": "****1982", "savings_balance": "2431.17"}`
 - **recovery**: `INTERSTITIAL_DISMISSED` (compliance_notice) at `s1`
@@ -17,11 +17,11 @@ Two declared, bounded recoveries in one run: Compliance Notice acknowledged (INT
 | step | status | locator | index | ms | screenshot |
 |---|---|---|---|---|---|
 | s1 | ok |  |  | 0 | [s1_after.jpg](screenshots/s1_after.jpg) |
-| s2 | ok | label_anchor | 0 | 165 | [s2_after.jpg](screenshots/s2_after.jpg) |
-| s3 | ok | role_name | 0 | 183 | [s3_after.jpg](screenshots/s3_after.jpg) |
-| s4 | ok | text_exact | 0 | 217 | [s4_after.jpg](screenshots/s4_after.jpg) |
-| s5 | ok | table_cell | 0 | 116 | [s5_after.jpg](screenshots/s5_after.jpg) |
-| s6 | ok | table_cell | 0 | 116 | [s6_after.jpg](screenshots/s6_after.jpg) |
+| s2 | ok | label_anchor | 0 | 114 | [s2_after.jpg](screenshots/s2_after.jpg) |
+| s3 | ok | role_name | 0 | 133 | [s3_after.jpg](screenshots/s3_after.jpg) |
+| s4 | ok | text_exact | 0 | 133 | [s4_after.jpg](screenshots/s4_after.jpg) |
+| s5 | ok | table_cell | 0 | 100 | [s5_after.jpg](screenshots/s5_after.jpg) |
+| s6 | ok | table_cell | 0 | 99 | [s6_after.jpg](screenshots/s6_after.jpg) |
 
 ## Screenshots
 

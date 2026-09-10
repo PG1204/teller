@@ -30,9 +30,10 @@ for the discovery run only — an LLM API key. Replay, the mock app and the whol
 with no key and no display.
 
 ```bash
-git clone <this repo> && cd teller
+git clone https://github.com/PG1204/teller.git && cd teller
 make install                 # venv, dependencies, Playwright Chromium
-cp .env.example .env         # then set GEMINI_API_KEY (or ANTHROPIC_API_KEY) for discovery
+cp .env.example .env
+# discovery only: put GEMINI_API_KEY (or ANTHROPIC_API_KEY) into .env
 ```
 
 `.env` is gitignored. The only secrets the system ever handles are the mock console's login
@@ -44,7 +45,9 @@ artifact, log or screenshot (see *Safety* in the report and `tests/guards/test_r
 Terminal 1 — the target application:
 
 ```bash
-make mock                    # Ledgerline console on http://127.0.0.1:8600 (log in with teller1 / Ledger!2026 to look around)
+make mock
+# Ledgerline console on http://127.0.0.1:8600 (port 8600 must be free). Log in with teller1 and the
+# password from .env.example to look around.
 ```
 
 Terminal 2 — discovery (real model), then replay (no model):
@@ -56,27 +59,43 @@ Terminal 2 — discovery (real model), then replay (no model):
   --param member_id=10001 --param-decl "member_id:string:pii_low:^[0-9]{5}$" \
   --output savings_balance:decimal:pii_low:currency_usd \
   --output savings_account_number:string:pii_high \
-  --provider gemini            # free tier: paced to 5 req/min; or --provider anthropic
+  --provider gemini --model gemini-3.6-flash
+# (free tier is paced to 5 requests/min; --provider anthropic uses claude-opus-5)
 
 # 2) deterministic replay of the saved capability, other inputs, no model
-.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001   # -> success, exit 0
-.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=20002   # -> business_outcome MEMBER_NOT_FOUND, exit 10
-.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=30003   # -> business_outcome ACCESS_DENIED, exit 10
+# success, exit 0
+.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001
+# business_outcome MEMBER_NOT_FOUND, exit 10
+.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=20002
+# business_outcome ACCESS_DENIED, exit 10
+.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=30003
 
 # 3) inject runtime faults into the mock, then replay
-.venv/bin/teller chaos arm app_error           && .venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001 --hitl none   # -> failure APP_ERROR (+ s1_fail.jpg, s1_fail.html), exit 20
-.venv/bin/teller chaos arm interstitial_known  && .venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001                # -> success with a recorded recovery
-.venv/bin/teller chaos arm expire_session      && .venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001                # -> success, session re-established, restarted from the anchor
+# failure APP_ERROR with screenshots/s1_fail.jpg and s1_fail.html, exit 20 (--hitl none: never wait for a human)
+.venv/bin/teller chaos arm app_error
+.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001 --hitl none
+# success with a recorded recovery (Compliance Notice acknowledged)
+.venv/bin/teller chaos arm interstitial_known
+.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001
+# success, session re-established and the flow restarted from its anchor
+.venv/bin/teller chaos arm expire_session
+.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001
 
 # 4) human handoff on the live session (headed browser + operator console at http://127.0.0.1:8787)
-.venv/bin/teller chaos arm interstitial_unknown && .venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001 --headed
-#   -> step 1 lands on an "Attestation Required" screen the artifact does not know. Do NOT touch the
-#      Chromium window yet: automation holds control until its 8 s wait times out and the terminal prints
-#      "HUMAN INTERVENTION REQUESTED" (console shows AWAITING_HUMAN). Then open the console, Claim,
-#      click "I attest" in the automation's own Chromium window, then "Hand control back" (retry_step).
-#      Faults are one-shot: arm again before each attempt.
-#   Headless twin of the same channel from another shell:
-.venv/bin/teller intervene claim <run_id> --operator you && .venv/bin/teller intervene resume <run_id> --mode retry_step
+.venv/bin/teller chaos arm interstitial_unknown
+.venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001 --headed
+```
+
+Step 1 lands on an "Attestation Required" screen the artifact does not know. Do not touch the Chromium
+window yet: automation holds control until its 8 s wait times out and the terminal prints
+`HUMAN INTERVENTION REQUESTED` (the console shows `AWAITING_HUMAN`). Then open the console, **Claim**,
+click **I attest** in the automation's own Chromium window, and **Hand control back** with `retry_step`.
+Faults are one-shot: arm again before each attempt. The headless twin of the same channel, from another
+shell, is `teller intervene claim <run_id> --operator you` followed by
+`teller intervene resume <run_id> --mode retry_step`; `scripts/handoff_demo.py` plays that operator
+automatically over CDP.
+
+```bash
 ```
 
 Other modes: `--provider scripted --cassette runs/<id>/cassette.json` replays a recorded discovery
@@ -89,10 +108,12 @@ through the real loop and browser with no key; `--unattended` never waits for a 
 ## Reading the output
 
 `replay` prints the result contract and exits `0` success · `10` business outcome · `20` failure ·
-`30` declined (a human stopped or refused; or policy needed a human in `--unattended`). Every run
-writes `runs/<run_id>/` with `events.jsonl` (structured, redacted, `controller` on every line),
-`screenshots/`, `result.json`, and on failure `<step>_fail.jpg` + `<step>_fail.html`. Curated copies
-for the reviewer live under [`evidence/`](evidence/README.md).
+`30` declined (a human stopped or refused; or policy needed a human in `--unattended`); `40` is only
+seen if a paused run is killed. Every run writes `runs/<run_id>/` with `events.jsonl` (structured,
+redacted, `controller` on every line), `screenshots/`, `result.json`, and on failure
+`screenshots/<step>_fail.jpg` plus `<step>_fail.html`. `pii_high` outputs are masked (`****1982`) in
+every file and on stdout; the full value is returned in memory to a calling program, or written only
+with `--emit-full-outputs`. Curated copies for the reviewer live under [`evidence/`](evidence/README.md).
 
 ## Layout
 
@@ -105,7 +126,7 @@ schema/           JSON Schema generated from the pydantic models (drift-tested)
 evidence/         curated runs: discovery, replays (success / outcome / error / recovered), handoff
 mockapp/          Ledgerline console (FastAPI + Jinja2) with the one-shot /__chaos fault API
 src/teller/
-  surface/        Surface protocol; WebPlaywrightSurface (only Playwright import); marks.js, resolvers.js, recorder.js
+  surface/        Surface protocol; WebPlaywrightSurface (only Playwright import); marks.js, resolvers.js, recorder.py (recorder.js source)
   discovery/      tools, prompts, Decider seam (gemini | anthropic | scripted), loop, recorder, emitter
   artifact/       pydantic schema + store (load → tenant override merge → validate; approval hash)
   replay/         model-free interpreter, classification, detectors, parsers, result contract
@@ -118,7 +139,7 @@ tests/            unit · guards (architecture boundaries, redaction audit) · i
 ## Tests
 
 ```bash
-make test          # everything: ~250 tests incl. live replay/handoff scenarios against the mock (starts its own instance)
+make test          # everything: ~500 tests incl. live replay/handoff scenarios against the mock (starts its own instance on a free port)
 make unit          # fast: schema, policy, state machine, parsers, classification, emitter, mock app
 make lint
 ```

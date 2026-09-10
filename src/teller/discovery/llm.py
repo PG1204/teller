@@ -140,6 +140,7 @@ class GeminiDecider:
         self._tools: list[ToolSpec] = []
         self._t = _Transcript()
         self._pending_call_name: str | None = None
+        self._extra_calls: list[str] = []  # parallel calls we answered with 'ignored'
         # free tier is 5 requests/minute on Flash: pace calls instead of tripping 429s
         rpm = requests_per_minute or float(os.environ.get("TELLER_GEMINI_RPM", "5"))
         self._min_interval = (60.0 / rpm) + 0.5 if rpm > 0 else 0.0
@@ -206,6 +207,13 @@ class GeminiDecider:
                     response={"ok": feedback.ok, "result": feedback.text},
                 )
             )
+            for extra in self._extra_calls:  # every emitted call must get a response
+                parts.append(types.Part.from_function_response(
+                    name=extra, response={"ok": False, "result": "ignored: exactly one tool call per turn; only the first was executed"},
+                ))
+        elif feedback is not None:
+            parts.append(types.Part.from_text(text=f"SYSTEM NOTE: {feedback.text}"))
+        self._extra_calls = []
         parts.append(types.Part.from_text(text=observation_text))
         if screenshot_jpeg:
             parts.append(types.Part.from_bytes(data=screenshot_jpeg, mime_type="image/jpeg"))
@@ -235,6 +243,8 @@ class GeminiDecider:
                 last_err = e
                 self._last_call = time.monotonic()
                 code = getattr(e, "code", None)
+                if code == 429 and ("PerDay" in str(e) or "per day" in str(e).lower()):
+                    raise DeciderError(f"gemini daily quota exhausted for {self.model}: {e}") from e
                 if code in (429, 500, 502, 503, 504) and attempt < self._max_retries - 1:
                     delay = _retry_delay_from(e) or (5 * (attempt + 1))
                     if code == 429:
@@ -269,14 +279,23 @@ class GeminiDecider:
         cand = resp.candidates[0]
         content = cand.content
         finish = str(getattr(cand, "finish_reason", "") or "")
+        if content is None or not content.parts:
+            # SAFETY / MAX_TOKENS / empty: nothing to echo back; report as a non-tool turn
+            self._pending_call_name = None
+            self._t.add(role="model", text=None, finish_reason=finish, usage=usage)
+            tool = "__refusal__" if "SAFETY" in finish.upper() or "BLOCK" in finish.upper() else "__no_tool__"
+            return Decision(tool=tool, args={}, stop_reason=finish or "empty", raw_usage=usage, latency_ms=latency)
         # echo the model turn back verbatim (thought signatures included) on the next call
         self._contents.append(content)
 
         text_bits: list[str] = []
         call: Any = None
         for part in content.parts or []:
-            if part.function_call is not None and call is None:
-                call = part.function_call
+            if part.function_call is not None:
+                if call is None:
+                    call = part.function_call
+                else:
+                    self._extra_calls.append(part.function_call.name)
             elif part.text and not getattr(part, "thought", False):
                 text_bits.append(part.text)
         if call is None:
@@ -355,18 +374,22 @@ class AnthropicDecider:
 
     def _trim_images(self) -> None:
         seen = 0
+        stub = {"type": "text", "text": "(earlier screenshot omitted)"}
         for msg in reversed(self._messages):
             if msg["role"] != "user" or not isinstance(msg["content"], list):
                 continue
-            for block in msg["content"]:
-                blocks = block.get("content") if block.get("type") == "tool_result" else [block]
-                if not isinstance(blocks, list):
-                    continue
-                for i, b in enumerate(blocks):
-                    if b.get("type") == "image":
-                        seen += 1
-                        if seen > self._keep_images:
-                            blocks[i] = {"type": "text", "text": "(earlier screenshot omitted)"}
+            for j, block in enumerate(msg["content"]):
+                if block.get("type") == "tool_result" and isinstance(block.get("content"), list):
+                    inner = block["content"]
+                    for i, b in enumerate(inner):
+                        if b.get("type") == "image":
+                            seen += 1
+                            if seen > self._keep_images:
+                                inner[i] = dict(stub)
+                elif block.get("type") == "image":
+                    seen += 1
+                    if seen > self._keep_images:
+                        msg["content"][j] = dict(stub)
 
     def decide(
         self, observation_text: str, screenshot_jpeg: bytes | None, feedback: ToolFeedback | None
@@ -395,6 +418,8 @@ class AnthropicDecider:
                     "content": [{"type": "text", "text": feedback.text}, *obs_blocks],
                 }
             ]
+        elif feedback is not None:
+            content = [{"type": "text", "text": f"SYSTEM NOTE: {feedback.text}"}, *obs_blocks]
         else:
             content = obs_blocks
         self._messages.append({"role": "user", "content": content})

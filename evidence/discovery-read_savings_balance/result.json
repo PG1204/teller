@@ -80,7 +80,7 @@
   },
   "llm_invoked": true,
   "policy_sha256": "6377f8a4792d6651c7059e06ba7df7726916e6e54d8890f149d5513c02bdd7ce",
-  "artifact_path": "/Users/prateekganigi/Documents/Projects/interface ai - THA/capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml",
+  "artifact_path": "capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml",
   "status": "success",
   "outputs": {
     "savings_account_number": "****1982",

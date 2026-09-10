@@ -20,9 +20,14 @@ Regenerate everything except the discovery run with `make mock` in one terminal 
 | [`replay-app_error/`](replay-app_error/index.md) | Injected HTTP 500 (`ORA-00600` page): a **hard failure** with step, expected vs observed, `s1_fail.jpg` and `s1_fail.html`. | `failure` `APP_ERROR`, exit 20 |
 | [`replay-recovered/`](replay-recovered/index.md) | Two declared, bounded **recoveries** in one run: a Compliance Notice interstitial acknowledged and a "Loading, please wait" page waited through. | `success` with `recoveries[2]` |
 | [`replay-session_expired/`](replay-session_expired/index.md) | Session expired mid-flow: vendor login routine re-run and the flow **restarted from the anchor** (allowed because no non-idempotent step had run). | `success` with `SESSION_REESTABLISHED` |
-| [`handoff-unknown_interstitial/`](handoff-unknown_interstitial/index.md) | An undeclared "Attestation Required" screen: `CHECKPOINT_FAILED` → intervention with context → operator **claims the same live browser** (here a headless CDP client), clicks "I attest" (captured in `human_actions.jsonl` with `controller: human`) → resume → handback verified → run completes. See `state.json` for the control-transfer history and `intervention.json` for the request. | `success` with `handoffs[1]` |
+| [`replay-unattended_approved/`](replay-unattended_approved/index.md) | The approved artifact (status pinned to its content hash) run with `--unattended`: no operator is ever waited for; a draft would be refused with `NOT_APPROVED`. | `success`, exit 0 |
+| [`handoff-unknown_interstitial/`](handoff-unknown_interstitial/index.md) | An undeclared "Attestation Required" screen: `CHECKPOINT_FAILED` → intervention with context → operator **claims the same live browser** (here a headless CDP client), clicks "I attest" (the click is in `human_actions.jsonl`; the matching `events.jsonl` lines carry `controller: human`) → resume → handback verified → run completes. See `state.json` for the control-transfer history and `intervention.json` for the request. | `success` with `handoffs[1]` |
 
 Not included on purpose: Playwright traces (they embed unredacted DOM; the exporter refuses them)
 and the two earlier discovery attempts on `gemini-3.8-flash` that completed every action correctly
-but were cut off by the free tier's 20-requests-per-day quota before the model could call `done`
-(their run directories are kept locally under `runs/` and are described in REPORT §7).
+but were cut off by the free tier's per-minute (5) and per-day (20) request quotas before the model
+could call `done` (described in REPORT §7).
+
+Known blemish, left as recorded: one line of the discovery run's `events.jsonl` shows the artifact
+filename as `<email>`. The redaction regex in force at the time treated `…balance@1.0.0.yaml` as an
+email address; it has since been tightened. Logs are never edited after the fact.

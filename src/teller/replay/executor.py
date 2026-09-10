@@ -10,7 +10,7 @@ Every observation is classified by ``classify.sweep`` (business outcome / recove
 / unknown dialog). Remedies are bounded by ``max_times``; after a timeout the engine re-observes
 and re-acts only if the step is ``idempotent``; session re-establishment restarts from
 ``restart_anchor`` only if no non-idempotent step has executed. Failures under
-``on_hard_failure: pause`` become an intervention (handoff controller, P4); with ``--unattended``
+``on_hard_failure: pause`` become an intervention (handoff controller); with ``--unattended``
 they are terminal.
 
 A guard test asserts this package never imports ``anthropic`` or ``google.genai``.
@@ -18,6 +18,7 @@ A guard test asserts this package never imports ``anthropic`` or ``google.genai`
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import re
@@ -97,7 +98,7 @@ class ReplayConfig:
     surface_factory: Any | None = None  # tests may inject a Surface
 
 
-# The handoff controller (P4) implements this: pause on the same session, return a resume mode.
+# The handoff controller implements this: pause on the same session, return a resume mode.
 Escalator = Any
 
 
@@ -173,15 +174,15 @@ class ReplayRunner:
             self.profile = load_profile(self.store.root / "apps" / self.cap.capability.app.profile / "profile.yaml")
             self.policy = load_policy(self.store.root / self.tenant.policy)
         except (ArtifactError, FileNotFoundError, OSError) as e:
-            self.policy = self.policy or Policy(origins=["http://invalid"], actions_allow=["read"])
-            self.redactor = Redactor(self.policy)
+            self.policy = None  # nothing loaded: no policy hash, params masked wholesale below
+            self.redactor = Redactor(Policy(origins=["http://unloaded.invalid"], actions_allow=["read"]))
             self.log = EventLog(self.run_dir, self.run_id, "replay", redact=self.redactor.scrub)
             raise _Stop(self._failure(FailureCode.ARTIFACT_INVALID, str(e))) from e
         cap, policy = self.cap, self.policy
         self.redactor = Redactor(policy, sensitive_selectors=self.profile.sensitive_selectors)
         self.redactor.register_params(cap, cfg.params)
         self.log = EventLog(self.run_dir, self.run_id, "replay", redact=self.redactor.scrub)
-        self.state = ControlState(self.run_dir, on_transition=self._on_transition, max_handoffs=cap.escalation_policy.max_handoffs)
+        self.state = ControlState(self.run_dir, on_transition=self._on_transition, max_handoffs=cap.escalation_policy.max_handoffs, redact=self.redactor.scrub)
         self.ctx.detectors = dict(self.profile.detectors)
         self.log.emit("run.start", {
             "capability": cap.capability.id, "version": cap.capability.version, "status": cap.capability.status,
@@ -234,7 +235,7 @@ class ReplayRunner:
             )
         surface = self.surface
         if isinstance(surface, WebPlaywrightSurface):
-            surface.probe_selectors = css_selectors(list(self.profile.detectors.values()) + [c.detect for c in self.profile.recoverable_conditions] + [c.detect for c in self.cap.recoverable_conditions] + [b.detect for b in self.cap.business_outcomes.values()])
+            surface.probe_selectors = css_selectors(load_predicates_for_probe(self.cap, self.profile))
         base = self.tenant.base_url.rstrip("/")
         login = self.profile.login
         entry = (login.entry_url if login and login.entry_url else self.cap.capability.app.entry_url).replace("{base_url}", base)
@@ -416,7 +417,8 @@ class ReplayRunner:
             info = self.surface.handle_dialog(False)  # type: ignore[union-attr]
             raise _Stop(self._hard_failure(FailureCode.UNEXPECTED_DIALOG, f"dialog {info.message if info else ''!r} matched no declared condition; dismissed (cancel)", step, self._observe()))
         code = FailureCode.APP_ERROR if sw.code == "app_error" else FailureCode.UNDECLARED_CONDITION
-        raise _Stop(self._hard_failure(code, sw.message or f"undeclared condition {sw.code}", step, obs))
+        expected = describe(step.expect, self.cfg.params) if step.expect else (f"wait_for {step.wait_for.model_dump(exclude_none=True)}" if step.wait_for else None)
+        raise _Stop(self._hard_failure(code, sw.message or f"undeclared condition {sw.code}", step, obs, expected=expected))
 
     def _remedy(self, cond: RecoverableCondition, source: str, step: Step, obs: Observation) -> str:
         assert self.surface and self.state and self.log and self.cap and self.profile
@@ -526,6 +528,8 @@ class ReplayRunner:
             raise _Stop(self._hard_failure(FailureCode.OUTPUT_PARSE_FAILED, str(e), step, r.observation or self._observe(), expected=f"{spec.parse} parse", observed_raw=self.redactor.scrub_text(raw))) from e  # type: ignore[union-attr]
         self.outputs[step.extract.output] = value
         self.redactor.register_output(self.cap, step.extract.output, value)  # type: ignore[union-attr]
+        if step.mask_in_evidence:
+            self.redactor.register_value(value, "pii_high")  # type: ignore[union-attr]
         self.log.emit("extract", {"output": step.extract.output, "value": self.redactor.masked_outputs(self.cap, {step.extract.output: value})[step.extract.output]}, step_id=step.id)  # type: ignore[union-attr]
 
     # ------------------------------------------------------------------ escalation
@@ -556,7 +560,8 @@ class ReplayRunner:
         shot = self._shot(f"{sid or 'run'}_fail")
         dom = None
         try:
-            dom = self.surface.dom_snapshot(str(self.run_dir / f"{sid or 'run'}_fail.html"))  # type: ignore[union-attr]
+            self.surface.dom_snapshot(str(self.run_dir / f"{sid or 'run'}_fail.html"))  # type: ignore[union-attr]
+            dom = f"{sid or 'run'}_fail.html"
         except Exception:  # noqa: BLE001
             pass
         observed = observed_summary(obs) if obs else None
@@ -598,7 +603,7 @@ class ReplayRunner:
 
     def _common(self) -> dict[str, Any]:
         cap = self.cap
-        params = self.redactor.masked_params(cap, self.cfg.params) if (cap and self.redactor) else dict(self.cfg.params)
+        params = self.redactor.masked_params(cap, self.cfg.params) if (cap and self.redactor) else {k: "<unloaded>" for k in self.cfg.params}
         return {
             "run_id": self.run_id, "mode": "replay", "tenant": self.cfg.tenant, "params": params,
             "capability": CapabilityRef(id=cap.capability.id, version=cap.capability.version, status=cap.capability.status) if cap else None,
@@ -619,7 +624,10 @@ class ReplayRunner:
         return {}
 
     def _write_result(self, result: Any) -> None:
-        (self.run_dir / "result.json").write_text(result.model_dump_json(indent=2, exclude_none=True), encoding="utf-8")
+        data = result.model_dump(mode="json", exclude_none=True)
+        if self.redactor is not None:
+            data = self.redactor.scrub(data)  # belt and braces over the per-field masking
+        (self.run_dir / "result.json").write_text(json.dumps(data, indent=2), encoding="utf-8")
 
     # ------------------------------------------------------------------ helpers
 

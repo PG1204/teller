@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "run_id": "rep_2026-09-10T05-54-47_e9f9",
+  "run_id": "rep_2026-09-10T22-43-11_f063",
   "mode": "replay",
   "capability": {
     "id": "ledgerline.member.read_savings_balance",
     "version": "1.0.0",
-    "status": "draft"
+    "status": "approved"
   },
   "tenant": "local",
   "params": {
@@ -19,7 +19,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "role_name",
-      "duration_ms": 197,
+      "duration_ms": 160,
       "screenshot": "screenshots/s1_after.jpg"
     },
     {
@@ -27,7 +27,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "label_anchor",
-      "duration_ms": 166,
+      "duration_ms": 99,
       "screenshot": "screenshots/s2_after.jpg"
     },
     {
@@ -35,7 +35,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "role_name",
-      "duration_ms": 183,
+      "duration_ms": 133,
       "screenshot": "screenshots/s3_after.jpg"
     },
     {
@@ -43,16 +43,16 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "text_exact",
-      "duration_ms": 199,
+      "duration_ms": 148,
       "screenshot": "screenshots/s4_after.jpg"
     }
   ],
   "handoffs": [],
-  "evidence_dir": "runs/rep_2026-09-10T05-54-47_e9f9",
+  "evidence_dir": "runs/rep_2026-09-10T22-43-11_f063",
   "timing": {
-    "started_at": "2026-09-10T05:54:47+00:00",
-    "finished_at": "2026-09-10T05:54:48+00:00",
-    "duration_ms": 1437,
+    "started_at": "2026-09-10T22:43:11+00:00",
+    "finished_at": "2026-09-10T22:43:12+00:00",
+    "duration_ms": 1092,
     "paused_ms": 0
   },
   "llm_invoked": false,

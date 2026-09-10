@@ -1,26 +1,25 @@
-# Evidence: `replay-session_expired`
+# Evidence: `replay-unattended_approved`
 
-Session expired mid-flow: vendor login routine re-run and the flow restarted from restart_anchor (SESSION_REESTABLISHED) because no non-idempotent step had executed; SUCCESS.
+The approved artifact (status pinned to its content hash) replayed with --unattended: no operator is ever waited for, a draft would have been refused with NOT_APPROVED; SUCCESS.
 
 ## Result
 
 - **status**: `success`
-- **mode**: replay  ·  **run**: `rep_2026-09-10T22-43-22_fc93`  ·  **llm_invoked**: False
+- **mode**: replay  ·  **run**: `rep_2026-09-10T22-43-25_3207`  ·  **llm_invoked**: False
 - **capability**: `ledgerline.member.read_savings_balance@1.0.0` (approved)
 - **params**: `{"member_id": "10001"}`
 - **outputs**: `{"savings_account_number": "****1982", "savings_balance": "2431.17"}`
-- **recovery**: `SESSION_REESTABLISHED` (session_expired) at `s1`
 
 ## Steps
 
 | step | status | locator | index | ms | screenshot |
 |---|---|---|---|---|---|
-| s1 | ok | role_name | 0 | 163 | [s1_after.jpg](screenshots/s1_after.jpg) |
-| s2 | ok | label_anchor | 0 | 99 | [s2_after.jpg](screenshots/s2_after.jpg) |
+| s1 | ok | role_name | 0 | 159 | [s1_after.jpg](screenshots/s1_after.jpg) |
+| s2 | ok | label_anchor | 0 | 98 | [s2_after.jpg](screenshots/s2_after.jpg) |
 | s3 | ok | role_name | 0 | 133 | [s3_after.jpg](screenshots/s3_after.jpg) |
 | s4 | ok | text_exact | 0 | 133 | [s4_after.jpg](screenshots/s4_after.jpg) |
-| s5 | ok | table_cell | 0 | 107 | [s5_after.jpg](screenshots/s5_after.jpg) |
-| s6 | ok | table_cell | 0 | 92 | [s6_after.jpg](screenshots/s6_after.jpg) |
+| s5 | ok | table_cell | 0 | 100 | [s5_after.jpg](screenshots/s5_after.jpg) |
+| s6 | ok | table_cell | 0 | 99 | [s6_after.jpg](screenshots/s6_after.jpg) |
 
 ## Screenshots
 

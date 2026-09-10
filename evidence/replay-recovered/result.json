@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "run_id": "rep_2026-09-10T05-54-51_51c2",
+  "run_id": "rep_2026-09-10T22-43-14_65c6",
   "mode": "replay",
   "capability": {
     "id": "ledgerline.member.read_savings_balance",
     "version": "1.0.0",
-    "status": "draft"
+    "status": "approved"
   },
   "tenant": "local",
   "params": {
@@ -39,7 +39,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "label_anchor",
-      "duration_ms": 165,
+      "duration_ms": 114,
       "screenshot": "screenshots/s2_after.jpg"
     },
     {
@@ -47,7 +47,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "role_name",
-      "duration_ms": 183,
+      "duration_ms": 133,
       "screenshot": "screenshots/s3_after.jpg"
     },
     {
@@ -55,7 +55,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "text_exact",
-      "duration_ms": 217,
+      "duration_ms": 133,
       "screenshot": "screenshots/s4_after.jpg"
     },
     {
@@ -63,7 +63,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "table_cell",
-      "duration_ms": 116,
+      "duration_ms": 100,
       "screenshot": "screenshots/s5_after.jpg"
     },
     {
@@ -71,16 +71,16 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "table_cell",
-      "duration_ms": 116,
+      "duration_ms": 99,
       "screenshot": "screenshots/s6_after.jpg"
     }
   ],
   "handoffs": [],
-  "evidence_dir": "runs/rep_2026-09-10T05-54-51_51c2",
+  "evidence_dir": "runs/rep_2026-09-10T22-43-14_65c6",
   "timing": {
-    "started_at": "2026-09-10T05:54:51+00:00",
-    "finished_at": "2026-09-10T05:54:59+00:00",
-    "duration_ms": 8336,
+    "started_at": "2026-09-10T22:43:14+00:00",
+    "finished_at": "2026-09-10T22:43:22+00:00",
+    "duration_ms": 7793,
     "paused_ms": 0
   },
   "llm_invoked": false,

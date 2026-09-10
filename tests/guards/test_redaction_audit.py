@@ -43,4 +43,6 @@ def test_no_secret_or_pii_high_literal_persisted(path: Path) -> None:
 def test_env_file_is_ignored_and_absent_from_git() -> None:
     gitignore = (ROOT / ".gitignore").read_text()
     assert ".env" in gitignore.splitlines()
-    assert not (ROOT / ".env.example").read_text().strip().splitlines()[-1].startswith("GEMINI_API_KEY=A")
+    for line in (ROOT / ".env.example").read_text().splitlines():
+        if "API_KEY=" in line:
+            assert line.split("=", 1)[1].strip() == "", f".env.example must not carry a key: {line}"

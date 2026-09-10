@@ -77,7 +77,7 @@ def test_app_error_is_a_hard_failure_with_rich_evidence(workdir: Path, mock_url:
     assert result.failure.code == "APP_ERROR"
     assert result.failure.step_id is not None
     assert result.failure.screenshot and (runner.run_dir / result.failure.screenshot).exists()
-    assert result.failure.dom_snapshot and Path(result.failure.dom_snapshot).exists()
+    assert result.failure.dom_snapshot and (runner.run_dir / result.failure.dom_snapshot).exists()
     assert result.failure.observed and "ORA-00600" in json.dumps(result.failure.observed)
     assert exit_code(result) == 20
 

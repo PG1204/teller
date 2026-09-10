@@ -4,8 +4,8 @@
        ▲                                                          │ deadline              │ resume
        │                                                          ▼                       ▼
        └────────────── verification passes ◀──────────── HANDBACK_VERIFYING ◀─────────────┘
-                                                                  │ fails (≤ max_handoffs) → STUCK_EVALUATING
-    any state ──abort/decline/finish──▶ FINISHED
+                                                                  │ (verification is done by the caller after
+    any state ──abort/decline/finish──▶ FINISHED                     handback; a failed check raises a new intervention)
 
 The ``controller`` (automation | human | none) is derived from the state. ``ControlToken`` is
 what the surface demands before acting: ``token.require_automation()`` raises
@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import os
 import secrets
 from collections.abc import Callable
 from enum import StrEnum
@@ -73,6 +74,13 @@ class IllegalTransition(RuntimeError):
 
 def _now() -> str:
     return dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat()
+
+
+def _atomic_write(path: Path, text: str) -> None:
+    """Readers (operator server thread, CLI in another process) never see a half-written file."""
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
 
 
 class InterventionRequest(BaseModel):
@@ -130,7 +138,9 @@ class ControlState:
         run_dir: Path | None = None,
         on_transition: Callable[[Transition], None] | None = None,
         max_handoffs: int = 2,
+        redact: Callable[[Any], Any] | None = None,
     ):
+        self._redact = redact or (lambda x: x)
         self.state: RunState = RunState.RUNNING
         self.history: list[Transition] = []
         self.run_dir = Path(run_dir) if run_dir else None
@@ -230,13 +240,9 @@ class ControlState:
         if not self.run_dir:
             return
         self.run_dir.mkdir(parents=True, exist_ok=True)
-        (self.run_dir / "state.json").write_text(
-            json.dumps(self.snapshot(), indent=2), encoding="utf-8"
-        )
+        _atomic_write(self.run_dir / "state.json", json.dumps(self._redact(self.snapshot()), indent=2))
         if self.pending:
-            (self.run_dir / "intervention.json").write_text(
-                self.pending.model_dump_json(indent=2, exclude_none=True), encoding="utf-8"
-            )
+            _atomic_write(self.run_dir / "intervention.json", json.dumps(self._redact(self.pending.model_dump(exclude_none=True)), indent=2))
 
 
 class ControlToken:

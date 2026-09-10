@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -80,7 +81,7 @@ class HandoffController:
               f"reason:  {req.reason}\nrun:     {run_dir}\n"
               f"console: {console_url or '(cli mode)'}\n"
               f"cli:     teller intervene claim {run_dir.name} --operator <you>\n"
-              f"         teller intervene resume {run_dir.name} --mode retry_step|skip_step|complete\n", flush=True)
+              f"         teller intervene resume {run_dir.name} --mode retry_step|skip_step|complete\n", flush=True, file=sys.stderr)
 
         actions_path = run_dir / "human_actions.jsonl"
         action_count = 0
@@ -88,7 +89,8 @@ class HandoffController:
 
         def sink(payload: dict[str, Any]) -> None:
             nonlocal action_count
-            action_count += 1
+            if payload.get("kind") in ("click", "change", "key", "dialog"):
+                action_count += 1  # count what the human did, not recorder plumbing events
             with actions_path.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps(payload) + "\n")
             elog.emit("human_action", payload, step_id=req.step_id, actor=f"operator:{handoff.claimed_by or 'unknown'}")
@@ -164,7 +166,10 @@ class HandoffController:
         req.released_at = handoff.released_at
         req.resolution = result_mode
         req.note = handoff.note
-        (run_dir / "intervention.json").write_text(req.model_dump_json(indent=2, exclude_none=True), encoding="utf-8")
+        redact = getattr(getattr(runner, "redactor", None), "scrub", lambda x: x)
+        tmp = run_dir / "intervention.json.tmp"
+        tmp.write_text(json.dumps(redact(req.model_dump(exclude_none=True)), indent=2), encoding="utf-8")
+        tmp.replace(run_dir / "intervention.json")
         if hasattr(runner, "handoffs"):
             runner.handoffs.append(handoff)
         elog.emit("handoff.released", {"resolution": result_mode, "human_actions": action_count, "note": handoff.note}, actor=f"operator:{handoff.claimed_by or 'none'}")

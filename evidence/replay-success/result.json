@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "run_id": "rep_2026-09-10T05-54-41_c5cc",
+  "run_id": "rep_2026-09-10T22-43-06_1294",
   "mode": "replay",
   "capability": {
     "id": "ledgerline.member.read_savings_balance",
     "version": "1.0.0",
-    "status": "draft"
+    "status": "approved"
   },
   "tenant": "local",
   "params": {
@@ -19,7 +19,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "role_name",
-      "duration_ms": 197,
+      "duration_ms": 173,
       "screenshot": "screenshots/s1_after.jpg"
     },
     {
@@ -27,7 +27,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "label_anchor",
-      "duration_ms": 167,
+      "duration_ms": 95,
       "screenshot": "screenshots/s2_after.jpg"
     },
     {
@@ -35,7 +35,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "role_name",
-      "duration_ms": 182,
+      "duration_ms": 133,
       "screenshot": "screenshots/s3_after.jpg"
     },
     {
@@ -43,7 +43,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "text_exact",
-      "duration_ms": 203,
+      "duration_ms": 133,
       "screenshot": "screenshots/s4_after.jpg"
     },
     {
@@ -51,7 +51,7 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "table_cell",
-      "duration_ms": 130,
+      "duration_ms": 99,
       "screenshot": "screenshots/s5_after.jpg"
     },
     {
@@ -59,16 +59,16 @@
       "status": "ok",
       "index_used": 0,
       "locator_kind": "table_cell",
-      "duration_ms": 116,
+      "duration_ms": 99,
       "screenshot": "screenshots/s6_after.jpg"
     }
   ],
   "handoffs": [],
-  "evidence_dir": "runs/rep_2026-09-10T05-54-41_c5cc",
+  "evidence_dir": "runs/rep_2026-09-10T22-43-06_1294",
   "timing": {
-    "started_at": "2026-09-10T05:54:41+00:00",
-    "finished_at": "2026-09-10T05:54:43+00:00",
-    "duration_ms": 2272,
+    "started_at": "2026-09-10T22:43:06+00:00",
+    "finished_at": "2026-09-10T22:43:07+00:00",
+    "duration_ms": 1828,
     "paused_ms": 0
   },
   "llm_invoked": false,

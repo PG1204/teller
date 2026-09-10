@@ -6,7 +6,7 @@
   "pending": null,
   "history": [
     {
-      "ts": "2026-09-10T05:55:12+00:00",
+      "ts": "2026-09-10T22:43:35+00:00",
       "from_state": "RUNNING",
       "to_state": "STUCK_EVALUATING",
       "controller": "automation",
@@ -14,7 +14,7 @@
       "reason": "CHECKPOINT_FAILED"
     },
     {
-      "ts": "2026-09-10T05:55:12+00:00",
+      "ts": "2026-09-10T22:43:35+00:00",
       "from_state": "STUCK_EVALUATING",
       "to_state": "AWAITING_HUMAN",
       "controller": "none",
@@ -22,7 +22,7 @@
       "reason": "after s1 the page changed but the expected state never appeared"
     },
     {
-      "ts": "2026-09-10T05:55:12+00:00",
+      "ts": "2026-09-10T22:43:35+00:00",
       "from_state": "AWAITING_HUMAN",
       "to_state": "HUMAN_IN_CONTROL",
       "controller": "human",
@@ -30,7 +30,7 @@
       "reason": "claim"
     },
     {
-      "ts": "2026-09-10T05:55:16+00:00",
+      "ts": "2026-09-10T22:43:39+00:00",
       "from_state": "HUMAN_IN_CONTROL",
       "to_state": "HANDBACK_VERIFYING",
       "controller": "automation",
@@ -38,7 +38,7 @@
       "reason": "retry_step"
     },
     {
-      "ts": "2026-09-10T05:55:16+00:00",
+      "ts": "2026-09-10T22:43:39+00:00",
       "from_state": "HANDBACK_VERIFYING",
       "to_state": "RUNNING",
       "controller": "automation",
@@ -46,7 +46,7 @@
       "reason": "retry_step"
     },
     {
-      "ts": "2026-09-10T05:55:17+00:00",
+      "ts": "2026-09-10T22:43:40+00:00",
       "from_state": "RUNNING",
       "to_state": "FINISHED",
       "controller": "none",

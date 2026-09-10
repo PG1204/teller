@@ -5,8 +5,8 @@
 ## Result
 
 - **status**: `business_outcome`
-- **mode**: replay  ·  **run**: `rep_2026-09-10T05-54-43_4180`  ·  **llm_invoked**: False
-- **capability**: `ledgerline.member.read_savings_balance@1.0.0` (draft)
+- **mode**: replay  ·  **run**: `rep_2026-09-10T22-43-08_4e26`  ·  **llm_invoked**: False
+- **capability**: `ledgerline.member.read_savings_balance@1.0.0` (approved)
 - **params**: `{"member_id": "20002"}`
 - **business outcome**: `MEMBER_NOT_FOUND` at `s3` — No member exists with that member_id
 
@@ -14,8 +14,8 @@
 
 | step | status | locator | index | ms | screenshot |
 |---|---|---|---|---|---|
-| s1 | ok | role_name | 0 | 197 | [s1_after.jpg](screenshots/s1_after.jpg) |
-| s2 | ok | label_anchor | 0 | 150 | [s2_after.jpg](screenshots/s2_after.jpg) |
+| s1 | ok | role_name | 0 | 161 | [s1_after.jpg](screenshots/s1_after.jpg) |
+| s2 | ok | label_anchor | 0 | 99 | [s2_after.jpg](screenshots/s2_after.jpg) |
 
 ## Screenshots
 

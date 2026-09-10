@@ -33,7 +33,7 @@ class HeuristicDecider:
             ("click", r"button 'Go'", {}),
             ("click", r"row .*10001", {}),
             ("read_value", r"cell '\$[\d,.]+' cell\(Accounts: Share Savings / Current Balance\)", {"output_name": "savings_balance"}),
-            ("read_value", r"cell '<account>' cell\(Accounts: Share Savings / Account #\)", {"output_name": "savings_account_number"}),
+            ("read_value", r"cell '<masked>' cell\(Accounts: Share Savings / Account #\)", {"output_name": "savings_account_number"}),
             ("assert_checkpoint", None, {"text_contains": "Member Detail"}),
             ("done", None, {"summary": "read the balance"}),
         ]

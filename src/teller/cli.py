@@ -1,27 +1,26 @@
 """``teller`` command line.
 
 Thin: every command parses arguments, loads config, and calls into a package. No logic here.
-Subcommands land phase by phase (see docs/PLAN.md §12):
 
-    schema export        P0   JSON Schema files for the artifact, profile, tenant, policy, result
-    chaos arm|reset|show P0   arm one-shot faults in the mock console
-    discover             P2   LLM-driven discovery run -> draft capability + evidence
-    replay               P3   deterministic, model-free execution of a capability
-    intervene            P4   operator CLI twin for the handoff channel
-    policy check         P3   static verification of an artifact against a policy
-    evidence export      P3   curate a run directory into /evidence/<name>
-    approve              P6   stretch: draft -> approved
+    schema export|validate   JSON Schema files for the artifact, profile, tenant, policy, result
+    chaos arm|reset|show     arm one-shot faults in the mock console
+    discover                 LLM-driven discovery run -> draft capability + evidence
+    replay                   deterministic, model-free execution of a capability
+    intervene                operator CLI twin for the handoff channel
+    policy check             static verification of an artifact against a policy
+    evidence export          curate a run directory into /evidence/<name>
+    approve                  draft -> approved, pinned to the artifact's content hash
 """
 
 from __future__ import annotations
 
 import json
-import os
-import sys
 from pathlib import Path
 
 import typer
 from dotenv import load_dotenv
+
+load_dotenv()  # before the sub-CLIs read TELLER_* defaults at import time
 
 app = typer.Typer(no_args_is_help=True, add_completion=False, rich_markup_mode="markdown")
 schema_app = typer.Typer(no_args_is_help=True, help="Export/inspect JSON Schemas.")
@@ -42,8 +41,6 @@ app.add_typer(evidence_app, name="evidence")
 from teller.hitl.cli import app as intervene_app  # noqa: E402
 
 app.add_typer(intervene_app, name="intervene")
-
-load_dotenv()
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -153,7 +150,7 @@ def chaos_show(tenant: str = typer.Option("local", "--tenant")) -> None:
 
 
 # --------------------------------------------------------------------------------------
-# placeholders that later phases replace (kept so `--help` documents the full surface)
+# review / misc
 # --------------------------------------------------------------------------------------
 
 
@@ -187,16 +184,3 @@ def version() -> None:
 
     typer.echo(__version__)
 
-
-def main() -> None:  # pragma: no cover
-    try:
-        app()
-    except KeyboardInterrupt:
-        typer.echo("interrupted", err=True)
-        sys.exit(130)
-
-
-if __name__ == "__main__":  # pragma: no cover
-    main()
-
-_ = os  # reserved for env-driven options added in later phases

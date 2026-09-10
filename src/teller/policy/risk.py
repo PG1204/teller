@@ -73,9 +73,14 @@ class RiskClassifier:
         elif action.kind == "click" and element is not None:
             text = self._control_text(element)
             explicit = self._explicit(element, path)
+            href = element.attrs.get("href", "")
+            plain_link = element.tag == "a" and bool(href) and not href.lower().startswith("javascript:")
+            # A plain navigation link only shows a screen (its destination is checked by the allowlist);
+            # the committing control on that screen is what carries the risk.
+            committing = element.is_submit or element.role == "button" or (element.tag == "a" and not plain_link)
             if explicit is not None:
-                computed, reason = explicit, "tenant-listed explicit element"
-            elif any(rx.search(text) for rx in self._irr["controls"]):
+                computed, reason = explicit, "policy-listed explicit element"
+            elif committing and any(rx.search(text) for rx in self._irr["controls"]):
                 computed, reason = "irreversible_write", f"control text {text!r} matches irreversible pattern"
             elif element.is_submit and any(
                 self._route_match(path, r) for r in self.policy.risk.irreversible.submit_routes

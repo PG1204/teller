@@ -178,7 +178,7 @@ def emit_capability(
             Step(
                 id=sid,
                 action=rs.kind,  # type: ignore[arg-type]
-                intent=rs.intent,
+                intent=canonicalize(rs.intent, params) or rs.intent,
                 idempotent=_idempotent(rs),
                 risk_class=rs.risk_class,
                 target=rs.target,

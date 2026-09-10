@@ -61,6 +61,12 @@ class OperatorServer:
                 self.wfile.write(body)
 
             def do_GET(self) -> None:  # noqa: N802
+                try:
+                    self._do_get()
+                except (json.JSONDecodeError, OSError) as e:  # a file mid-write: ask the page to retry
+                    self._send(503, json.dumps({"error": f"retry: {e}"}).encode())
+
+            def _do_get(self) -> None:
                 path = urlsplit(self.path).path
                 if path in ("/", "/interventions", "/interventions/"):
                     self._send(200, _HTML.encode(), "text/html; charset=utf-8")
@@ -87,7 +93,13 @@ class OperatorServer:
                 if path == "/events":
                     p = run_dir / "events.jsonl"
                     lines = p.read_text(encoding="utf-8").splitlines()[-8:] if p.exists() else []
-                    self._send(200, json.dumps([json.loads(line) for line in lines]).encode())
+                    events = []
+                    for line in lines:
+                        try:
+                            events.append(json.loads(line))
+                        except json.JSONDecodeError:
+                            continue  # last line may still be being written
+                    self._send(200, json.dumps(events).encode())
                     return
                 self._send(404, b"not found", "text/plain")
 

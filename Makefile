@@ -11,7 +11,7 @@ install:
 	$(PY) -m playwright install chromium
 
 mock:
-	$(PY) -m uvicorn mockapp.app:app --port $(MOCK_PORT)
+	@set -a; [ -f .env ] && . ./.env; set +a; $(PY) -m uvicorn mockapp.app:app --port $(MOCK_PORT)
 
 test:
 	$(PY) -m pytest

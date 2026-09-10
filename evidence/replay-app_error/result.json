@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "run_id": "rep_2026-09-10T05-54-49_f720",
+  "run_id": "rep_2026-09-10T22-43-12_a3dc",
   "mode": "replay",
   "capability": {
     "id": "ledgerline.member.read_savings_balance",
     "version": "1.0.0",
-    "status": "draft"
+    "status": "approved"
   },
   "tenant": "local",
   "params": {
@@ -23,11 +23,11 @@
     }
   ],
   "handoffs": [],
-  "evidence_dir": "runs/rep_2026-09-10T05-54-49_f720",
+  "evidence_dir": "runs/rep_2026-09-10T22-43-12_a3dc",
   "timing": {
-    "started_at": "2026-09-10T05:54:49+00:00",
-    "finished_at": "2026-09-10T05:54:50+00:00",
-    "duration_ms": 910,
+    "started_at": "2026-09-10T22:43:12+00:00",
+    "finished_at": "2026-09-10T22:43:13+00:00",
+    "duration_ms": 737,
     "paused_ms": 0
   },
   "llm_invoked": false,
@@ -38,17 +38,18 @@
     "code": "APP_ERROR",
     "step_id": "s1",
     "message": "detector 'app_error' fired at s1 with no declared disposition",
+    "expected": "text_contains='Member Search' in frame 'main'",
     "observed": {
       "url": "http://127.0.0.1:8600/console/members/search",
       "title": "Ledgerline Credit Union - Member Servicing Console",
       "http_status": 500,
       "dialog": null,
-      "visible_text_head": "Menu » Home » Members » Reports Signed in as <secret> » Sign Out Ledgerline Credit Union Member Servicing Console Application Error Application Error ORA-00600: internal error code Module: LLSERV.CONS",
+      "visible_text_head": "Menu \u00bb Home \u00bb Members \u00bb Reports Signed in as <secret> \u00bb Sign Out Ledgerline Credit Union Member Servicing Console Application Error Application Error ORA-00600: internal error code Module: LLSERV.CONS",
       "detector_hits": [],
       "element_count": 4
     },
     "screenshot": "screenshots/s1_fail.jpg",
-    "dom_snapshot": "runs/rep_2026-09-10T05-54-49_f720/s1_fail.html",
+    "dom_snapshot": "s1_fail.html",
     "diagnostics": []
   }
 }

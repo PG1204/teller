@@ -61,8 +61,10 @@
     return { badged: Object.keys(ids).length };
   }
 
-  // ------------------------------------------------------------------ collect
-  clear(false);
+  // ------------------------------------------------------------------ mask / collect
+  // "mask" wraps sensitive text nodes (no element collection) so ANY screenshot path can mask them
+  // by selector; "collect" does the same first, then walks the elements.
+  if (phase !== "mask") clear(false);
 
   // 1) wrap sensitive text nodes so the screenshot can mask them by selector
   const regexes = (opts.maskRegexes || []).map((r) => { try { return new RegExp(r, "g"); } catch (e) { return null; } }).filter(Boolean);
@@ -90,6 +92,7 @@
     }
   }
   const sensitiveSelectors = (opts.sensitiveSelectors || []).join(",");
+  if (phase === "mask") return { masked: doc.querySelectorAll("span[data-teller-mask]").length };
 
   // 2) helpers
   const vw = window.innerWidth, vh = window.innerHeight;
@@ -319,7 +322,7 @@
     out.push({
       idx: local++,
       role, tag: tag.toLowerCase(),
-      name: sensitive && tag !== "INPUT" ? accessibleName(el, role) : accessibleName(el, role),
+      name: sensitive && (tag === "TD" || tag === "TH") ? "" : accessibleName(el, role),
       text,
       bbox: [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)],
       input_type: type,

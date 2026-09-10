@@ -8,7 +8,7 @@ evidence (events, badged screenshots, redacted transcript, usage, optional casse
 Stuck triggers (cheapest first): MODEL_SELF_REPORT (ask_human) · NO_PROGRESS (3 identical
 observations) · OSCILLATION (A-B-A-B within 6 actions) · POLICY_BLOCKED_TWICE ·
 IRREVERSIBLE_STEP · UNKNOWN_STATE (refusal, prose-only twice, blank page) · BUDGET.
-Escalation writes an ``InterventionRequest``; the handoff controller (P4) may hand the live
+Escalation writes an ``InterventionRequest``; the handoff controller may hand the live
 session to a human and resume, otherwise the run ends as ``needs_human``.
 """
 
@@ -39,9 +39,13 @@ from teller.policy.redact import Redactor
 from teller.replay.detectors import EvalContext, css_selectors, evaluate
 from teller.replay.result import (
     CapabilityRef,
+    Declined,
+    DeclinedCode,
+    DeclinedResult,
     Failure,
     FailureCode,
     FailureResult,
+    Handoff,
     NeedsHumanResult,
     StepReport,
     SuccessResult,
@@ -76,6 +80,9 @@ class DiscoveryConfig:
     operator: str = "operator"
     cdp_port: int | None = None
     settle_ms: int = 1500
+    version_range: str = "*"
+    surface: str = "web_legacy"
+    entry_url: str = "{base_url}/console"
 
 
 @dataclass
@@ -106,7 +113,7 @@ class DiscoveryRunner:
         (self.run_dir / "screenshots").mkdir(exist_ok=True)
         self.redactor = Redactor(cfg.policy, sensitive_selectors=cfg.profile.sensitive_selectors)
         self.log = EventLog(self.run_dir, self.run_id, "discovery", redact=self.redactor.scrub)
-        self.state = ControlState(self.run_dir, on_transition=self._on_transition)
+        self.state = ControlState(self.run_dir, on_transition=self._on_transition, redact=self.redactor.scrub)
         self.gate = PolicyGate(cfg.policy)
         self.surface = WebPlaywrightSurface(
             self.gate, self.redactor, headed=cfg.headed, cdp_port=cfg.cdp_port,
@@ -116,6 +123,7 @@ class DiscoveryRunner:
         self.ctx = EvalContext(params=dict(cfg.params), detectors=cfg.profile.detectors)
         self.turn = 0
         self.started = time.monotonic()
+        self.started_at = now_iso()
         self.paused_ms = 0
         self._history: list[tuple[str, str]] = []  # (url, digest)
         self._actions: list[tuple[str, str, str]] = []  # (tool, hint, frame)
@@ -124,13 +132,16 @@ class DiscoveryRunner:
         self._pending: RecordedStep | None = None
         self._screens: list[str] = []
         self.status = "running"
+        self.handoffs: list[Handoff] = []
+        self.max_handoffs = 2
 
     # ---------------------------------------------------------------- plumbing
 
     def _on_transition(self, t: Any) -> None:
         self.log.set_controller(t.controller.value)
-        self.log.emit("handoff.command" if t.to_state in (RunState.HUMAN_IN_CONTROL,) else "escalation",
-                      {"from": t.from_state, "to": t.to_state, "reason": t.reason}, actor=t.actor)
+        kind = ("handoff.claimed" if t.to_state is RunState.HUMAN_IN_CONTROL
+                else "handoff.released" if t.from_state is RunState.HUMAN_IN_CONTROL else "escalation")
+        self.log.emit(kind, {"from": t.from_state, "to": t.to_state, "reason": t.reason}, actor=t.actor)
 
     def _secrets(self) -> dict[str, str]:
         out: dict[str, str] = {}
@@ -364,6 +375,8 @@ class DiscoveryRunner:
 
     def _escalate_or_finish(self, trigger: str, reason: str) -> DiscoveryReport:
         self.log.emit("escalation", {"trigger": trigger, "reason": reason, "turn": self.turn})
+        if self.escalator is not None and self.state.handoffs >= self.max_handoffs:
+            return self._finish_failure(FailureCode.HANDOFF_LIMIT_EXCEEDED, f"{trigger}: {reason} (max_handoffs={self.max_handoffs} reached)")
         shot = self.run_dir / "screenshots" / f"escalation_{self.turn:02d}.jpg"
         try:
             self.surface.screenshot(str(shot))
@@ -378,17 +391,24 @@ class DiscoveryRunner:
         )
         self.state.raise_intervention(req)
         if self.escalator is not None:
+            t0 = time.monotonic()
             mode = self.escalator(self, req)
-            if mode in ("retry_step", "continue"):
+            self.paused_ms += int((time.monotonic() - t0) * 1000)
+            if mode in ("retry_step", "skip_step"):
                 self._history.clear()
                 self._actions.clear()
                 return self._loop_after_resume()
             if mode == "complete":
                 return self._finish_success(self.surface.observe(badges=False), "completed by operator")
+            if mode in ("abort", "decline"):
+                code = DeclinedCode.CONFIRMATION_DECLINED if mode == "decline" else DeclinedCode.ABORTED_BY_HUMAN
+                by = self.handoffs[-1].claimed_by if self.handoffs else None
+                return self._finish_declined(code, by, reason)
+            return self._finish_failure(FailureCode.ESCALATION_TIMEOUT, f"nobody claimed the intervention ({trigger}: {reason})")
         self.status = "needs_human"
         result = NeedsHumanResult(
             run_id=self.run_id, mode="discovery", goal=self.cfg.goal, tenant=self.cfg.tenant.tenant,
-            params=self._masked_params(), steps=self._step_reports(), evidence_dir=str(self.run_dir),
+            params=self._masked_params(), steps=self._step_reports(), handoffs=list(self.handoffs), evidence_dir=str(self.run_dir),
             timing=self._timing(), llm_invoked=True, policy_sha256=self.cfg.policy.sha256(),
             intervention_id=req.intervention_id, trigger=trigger, step_id=req.step_id,
         )
@@ -411,25 +431,42 @@ class DiscoveryRunner:
         cap = emit_capability(
             self.recorder, goal=self.cfg.goal, params=self.cfg.params, param_decls=self.cfg.param_decls,
             output_decls=self.cfg.output_decls, capability_id=self.cfg.capability_id, title=self.cfg.title,
-            description=self.cfg.description, profile=self.cfg.profile.profile, version_range=">=4.1 <5",
-            surface="web_legacy", entry_url="{base_url}/console", discovered_by=f"{self.decider.name}:{self.decider.model}",
+            description=self.cfg.description, profile=self.cfg.profile.profile, version_range=self.cfg.version_range,
+            surface=self.cfg.surface, entry_url=self.cfg.entry_url, discovered_by=f"{self.decider.name}:{self.decider.model}",
             run_id=self.run_id, transcript_sha256=transcript_sha, version=self.cfg.version, notes=f"model summary: {summary}" if summary else None,
         )
         draft_dir = self.run_dir / "draft"
         draft_path = save_capability(cap, draft_dir)
         artifact_path = save_capability(cap, self.cfg.save_to) if self.cfg.save_to else draft_path
+        try:
+            artifact_path = Path(artifact_path).resolve().relative_to(Path.cwd().resolve())
+        except ValueError:
+            pass
         self.log.emit("result", {"status": "success", "outputs": self.redactor.masked_outputs(cap, self.recorder.outputs), "artifact": str(artifact_path), "steps": len(cap.steps)})
         self.status = "success"
         result = SuccessResult(
             run_id=self.run_id, mode="discovery", goal=self.cfg.goal, tenant=self.cfg.tenant.tenant,
             capability=CapabilityRef(id=cap.capability.id, version=cap.capability.version, status="draft"),
             params=self._masked_params(), outputs=self.redactor.masked_outputs(cap, self.recorder.outputs),
-            steps=self._step_reports(), evidence_dir=str(self.run_dir), timing=self._timing(),
+            steps=self._step_reports(), handoffs=list(self.handoffs), evidence_dir=str(self.run_dir), timing=self._timing(),
             llm_invoked=True, policy_sha256=self.cfg.policy.sha256(), artifact_path=str(artifact_path),
         )
         self._write_result(result)
         self.state.finish(reason="done")
         return DiscoveryReport(self.run_id, self.run_dir, "success", cap, artifact_path, dict(self.recorder.outputs), self.turn, result)
+
+    def _finish_declined(self, code: DeclinedCode, by: str | None, note: str) -> DiscoveryReport:
+        self.status = "declined"
+        result = DeclinedResult(
+            run_id=self.run_id, mode="discovery", goal=self.cfg.goal, tenant=self.cfg.tenant.tenant,
+            params=self._masked_params(), steps=self._step_reports(), handoffs=list(self.handoffs), evidence_dir=str(self.run_dir),
+            timing=self._timing(), llm_invoked=True, policy_sha256=self.cfg.policy.sha256(),
+            declined=Declined(code=code, by=by, note=note, step_id=f"s{len(self.recorder.steps) + 1}"),
+        )
+        self._write_result(result)
+        self.log.emit("result", {"status": "declined", "code": code})
+        self.state.finish(reason=code)
+        return DiscoveryReport(self.run_id, self.run_dir, "declined", None, None, dict(self.recorder.outputs), self.turn, result, reason=note)
 
     def _finish_failure(self, code: FailureCode, message: str) -> DiscoveryReport:
         self.status = "failure"
@@ -465,10 +502,11 @@ class DiscoveryRunner:
         ]
 
     def _timing(self) -> Timing:
-        return Timing(started_at=now_iso(), finished_at=now_iso(), duration_ms=int((time.monotonic() - self.started) * 1000), paused_ms=self.paused_ms)
+        return Timing(started_at=self.started_at, finished_at=now_iso(), duration_ms=int((time.monotonic() - self.started) * 1000), paused_ms=self.paused_ms)
 
     def _write_result(self, result: Any) -> None:
-        (self.run_dir / "result.json").write_text(result.model_dump_json(indent=2, exclude_none=True), encoding="utf-8")
+        data = self.redactor.scrub(result.model_dump(mode="json", exclude_none=True))
+        (self.run_dir / "result.json").write_text(json.dumps(data, indent=2), encoding="utf-8")
 
     def _write_transcript(self) -> str | None:
         turns = self.redactor.scrub(self.decider.transcript())
@@ -484,7 +522,7 @@ class DiscoveryRunner:
                 self._write_transcript()
             (self.run_dir / "usage.json").write_text(json.dumps(self.decider.usage(), indent=2), encoding="utf-8")
             if self.cfg.record_cassette and self.decider.name != "scripted":
-                cassette = cassette_from_transcript(self.decider.name, self.decider.model, self.decider.transcript())
+                cassette = self.redactor.scrub(cassette_from_transcript(self.decider.name, self.decider.model, self.decider.transcript()))
                 (self.run_dir / "cassette.json").write_text(json.dumps(cassette, indent=2), encoding="utf-8")
             self.log.emit("run.end", {"status": self.status, "turns": self.turn, "usage": self.decider.usage()})
         except Exception:  # noqa: BLE001

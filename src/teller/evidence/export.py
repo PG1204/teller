@@ -13,7 +13,7 @@ import shutil
 from pathlib import Path
 
 TEXT_SUFFIXES = {".json", ".jsonl", ".yaml", ".yml", ".md", ".txt", ".html"}
-REFUSED = {"trace.zip"}
+REFUSED = {"trace.zip", "handoff_live.jpg"}  # traces cannot be redacted; the live preview is transient
 SCRUB = [
     (re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), "<ssn>"),
     (re.compile(r"\b\d{13,19}\b"), "<card>"),
@@ -34,6 +34,8 @@ def export_run(src: Path, dst: Path, *, note: str = "") -> str:
             text = f.read_text(encoding="utf-8", errors="replace")
             for rx, rep in SCRUB:
                 text = rx.sub(rep, text)
+            root = str(Path.cwd().resolve()) + "/"
+            text = text.replace(root, "").replace(json.dumps(root)[1:-1], "")  # no local paths in evidence
             out.write_text(text, encoding="utf-8")
         else:
             shutil.copy2(f, out)

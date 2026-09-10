@@ -13,6 +13,8 @@ import threading
 import time
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from teller.evidence.log import configure_console_logging
 from teller.hitl.commands import append_command, read_intervention
 from teller.hitl.handoff import HandoffController
@@ -52,6 +54,7 @@ def operator(run_dir: Path, cdp_port: int) -> None:
 
 
 def main() -> int:
+    load_dotenv()  # mock credentials, like the teller CLI does
     configure_console_logging()
     artifact = Path(sys.argv[1] if len(sys.argv) > 1 else "capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml")
     cdp_port = free_port()
