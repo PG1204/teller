@@ -56,7 +56,7 @@ Terminal 2 — discovery (real model), then replay (no model):
   --param member_id=10001 --param-decl "member_id:string:pii_low:^[0-9]{5}$" \
   --output savings_balance:decimal:pii_low:currency_usd \
   --output savings_account_number:string:pii_high \
-  --provider gemini            # or: --provider anthropic
+  --provider gemini            # free tier: paced to 5 req/min; or --provider anthropic
 
 # 2) deterministic replay of the saved capability, other inputs, no model
 .venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001   # -> success, exit 0
@@ -81,7 +81,7 @@ through the real loop and browser with no key; `--unattended` never waits for a 
 `draft` artifacts; `--confirm-step s7@1.0.0` pre-authorises one irreversible step by id and version.
 
 `make` shortcuts: `make discover`, `make demo-replay`, `make replay-not-found`, `make replay-error`,
-`make replay-recovered`, `make handoff-demo`, `make test`, `make lint`, `make schemas`.
+`make replay-recovered`, `make handoff-demo`, `make evidence` (regenerates `evidence/`), `make test`, `make lint`, `make schemas`.
 
 ## Reading the output
 

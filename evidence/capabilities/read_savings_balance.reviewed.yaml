@@ -1,0 +1,438 @@
+schema_version: 1
+capability:
+  id: ledgerline.member.read_savings_balance
+  version: 1.0.0
+  status: draft
+  title: Read a member's current Share Savings balance
+  description: Looks up a member by member number and returns the account number and current balance of
+    their Share Savings account. MEMBER_NOT_FOUND, ACCESS_DENIED and NO_SAVINGS_ACCOUNT are legitimate
+    business outcomes, not failures.
+  risk_class: read
+  app:
+    profile: ledgerline-msc
+    version_range: '>=4.1 <5'
+    surface: web_legacy
+    entry_url: '{base_url}/console'
+  provenance:
+    discovered_by: gemini:gemini-3.6-flash
+    discovery_run_id: disc_2026-09-10T05-11-24_243d
+    transcript_sha256: 8e8d0961c49042e01dccb24e9e988ebde1e864f751bfdda33b95088353d4b421
+    recorded_at: '2026-09-10T05:14:03+00:00'
+    human_authored_steps: []
+  review:
+    reviewed_by: PG1204
+    reviewed_at: '2026-09-10T05:25:02+00:00'
+    notes: 'Reviewed the draft emitted by discovery run disc_2026-09-10T05-11-24_243d (gemini-3.6-flash).
+      Kept every step and locator bundle as recorded. Added what a happy-path run cannot observe: three
+      business outcomes declared at the steps that produce them (MEMBER_NOT_FOUND@s3, ACCESS_DENIED@s4,
+      NO_SAVINGS_ACCOUNT@s5), two bounded recoveries (compliance notice interstitial, slow-load wait),
+      parameter/output descriptions and a 10-digit pattern on the account number. Original model summary:
+      Successfully looked up member 10001 and read the current balance and account number for their Share
+      Savings account. Review edit: removed the role_name strategy from s2 — the ''Member #'' name comes
+      from the adjacent table cell, which is not an ARIA accessible name, so Playwright''s role engine
+      cannot resolve it (the first replay confirmed this via LOCATOR_FALLBACK_USED); label_anchor is the
+      correct primary for legacy forms. Locator order before: [''role_name'', ''label_anchor'', ''attr_stable'',
+      ''coords_verified''].'
+params:
+  member_id:
+    type: string
+    description: Five-digit member number
+    required: true
+    pattern: ^[0-9]{5}$
+    classification: pii_low
+    example: '10001'
+outputs:
+  savings_account_number:
+    type: string
+    description: Share Savings account number (10 digits); pii_high — masked everywhere except the caller's
+      in-memory result
+    parse: string
+    pattern: ^[0-9]{10}$
+    classification: pii_high
+    source_step: s5
+  savings_balance:
+    type: decimal
+    description: Current Share Savings balance in USD, parsed from the Accounts table
+    parse: currency_usd
+    classification: pii_low
+    source_step: s6
+business_outcomes:
+  MEMBER_NOT_FOUND:
+    description: No member exists with that member_id
+    detect:
+      frame: main
+      text_contains: No members matched your search.
+    at_steps:
+    - s3
+    returns:
+      member_id: '{member_id}'
+  ACCESS_DENIED:
+    description: The operator may not view this member (restricted branch)
+    detect:
+      frame: main
+      any_of:
+      - http_status: 403
+      - text_contains: You are not authorized
+    at_steps:
+    - s4
+    returns: {}
+  NO_SAVINGS_ACCOUNT:
+    description: The member exists but holds no Share Savings account
+    detect:
+      all:
+      - frame: main
+        text_contains: Member Detail
+      - none_of:
+        - frame: main
+          text_contains: Share Savings
+    at_steps:
+    - s5
+    returns: {}
+recoverable_conditions:
+- id: compliance_notice
+  detect:
+    frame: main
+    text_contains: Compliance Notice
+  remedy:
+    action: click
+    target:
+      frame: main
+      text_hint: Acknowledge
+      locators:
+      - robustness: button label; vendor-stable
+        surfaces:
+        - web
+        - web_legacy
+        - desktop
+        kind: role_name
+        role: button
+        name: Acknowledge
+        exact: true
+      - surfaces:
+        - web
+        - web_legacy
+        - desktop
+        kind: text_exact
+        text: Acknowledge
+  max_times: 1
+- id: slow_load
+  detect:
+    frame: main
+    text_contains: Loading, please wait
+  remedy:
+    action: wait_and_retry
+    backoff_ms:
+    - 2000
+    - 4000
+    - 8000
+  max_times: 3
+restart_anchor: s1
+steps:
+- id: s1
+  action: click
+  intent: Navigate to Member Search to look up member 10001.
+  idempotent: true
+  risk_class: read
+  target:
+    frame: main
+    text_hint: Member Search
+    tag_hint: a
+    locators:
+    - robustness: accessible name is operator-visible text; survives branding and CSS
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: role_name
+      role: link
+      name: Member Search
+      exact: true
+    - robustness: same visible text, no role dependency
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: text_exact
+      text: Member Search
+      tag: a
+    - robustness: recorded viewport only; verified by text under the point; never trusted for unattended
+        replay
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: coords_verified
+      x: 82
+      y: 106
+      viewport:
+      - 1280
+      - 800
+      verify_text: Member Search
+  clear_first: false
+  wait_for:
+    state: text
+    text: Member Search
+    frame: main
+    timeout_ms: 8000
+  expect:
+    frame: main
+    text_contains: Member Search
+  on_outcome: []
+  mask_in_evidence: false
+- id: s2
+  action: type
+  intent: 'Enter member number 10001 into Member # field.'
+  idempotent: true
+  risk_class: read
+  target:
+    frame: main
+    text_hint: 'Member #'
+    tag_hint: input
+    locators:
+    - robustness: legacy tables carry no <label for>; the visible label in the adjacent cell is what vendors
+        keep stable across tenants
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: label_anchor
+      label: 'Member #'
+      relation: same_row_right
+      control: text_input
+    - robustness: cryptic but stable within this vendor build; fails across re-skins
+      surfaces:
+      - web
+      - web_legacy
+      kind: attr_stable
+      attr: name
+      value: txtF1
+      tag: input
+    - robustness: recorded viewport only; verified by text under the point; never trusted for unattended
+        replay
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: coords_verified
+      x: 171
+      y: 82
+      viewport:
+      - 1280
+      - 800
+      verify_text: 'Member #'
+  value:
+    param: member_id
+  clear_first: true
+  expect:
+    value_equals:
+      param: member_id
+  on_outcome: []
+  mask_in_evidence: false
+- id: s3
+  action: click
+  intent: Click Go button to search for member 10001.
+  idempotent: true
+  risk_class: read
+  target:
+    frame: main
+    text_hint: Go
+    tag_hint: input
+    locators:
+    - robustness: accessible name is operator-visible text; survives branding and CSS
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: role_name
+      role: button
+      name: Go
+      exact: true
+    - robustness: cryptic but stable within this vendor build; fails across re-skins
+      surfaces:
+      - web
+      - web_legacy
+      kind: attr_stable
+      attr: name
+      value: cmdGo
+      tag: input
+    - robustness: recorded viewport only; verified by text under the point; never trusted for unattended
+        replay
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: coords_verified
+      x: 154
+      y: 134
+      viewport:
+      - 1280
+      - 800
+      verify_text: Go
+  clear_first: false
+  wait_for:
+    state: text
+    text: Search Results
+    frame: main
+    timeout_ms: 8000
+  expect:
+    frame: main
+    text_contains: Search Results
+  on_outcome:
+  - MEMBER_NOT_FOUND
+  mask_in_evidence: false
+- id: s4
+  action: click
+  intent: Click member result row to view member profile.
+  idempotent: true
+  risk_class: read
+  target:
+    frame: main
+    text_hint: '{member_id}'
+    tag_hint: tr
+    locators:
+    - robustness: row containing the identifying cell text
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: text_exact
+      text: '{member_id}'
+      tag: tr
+    - robustness: 'structural: the row containing the identifying cell; flags drift'
+      surfaces:
+      - web
+      - web_legacy
+      kind: xpath_anchored
+      anchor_text: '{member_id}'
+      xpath: ancestor::tr[1]
+    - robustness: recorded viewport only; verified by text under the point; never trusted for unattended
+        replay
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: coords_verified
+      x: 549
+      y: 107
+      viewport:
+      - 1280
+      - 800
+      verify_text: '{member_id}'
+  clear_first: false
+  wait_for:
+    state: text
+    text: Member Detail
+    frame: main
+    timeout_ms: 8000
+  expect:
+    frame: main
+    text_contains: Member Detail
+  on_outcome:
+  - ACCESS_DENIED
+  mask_in_evidence: false
+- id: s5
+  action: read
+  intent: Read the Share Savings account number.
+  idempotent: true
+  risk_class: read
+  target:
+    frame: main
+    tag_hint: td
+    locators:
+    - robustness: header-name addressed; survives row and column reordering
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: table_cell
+      table_anchor: Accounts
+      row_match:
+        column: Product
+        equals: Share Savings
+      column: 'Account #'
+    - robustness: positional within the identified row; flags drift when used
+      surfaces:
+      - web
+      - web_legacy
+      kind: xpath_anchored
+      anchor_text: Share Savings
+      xpath: ancestor::tr[1]/td[2]
+    - robustness: recorded viewport only; verified by text under the point; never trusted for unattended
+        replay
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: coords_verified
+      x: 404
+      y: 223
+      viewport:
+      - 1280
+      - 800
+      verify_text: ''
+  clear_first: false
+  on_outcome:
+  - NO_SAVINGS_ACCOUNT
+  extract:
+    output: savings_account_number
+    parse: string
+  mask_in_evidence: true
+- id: s6
+  action: read
+  intent: Read the Share Savings current balance.
+  idempotent: true
+  risk_class: read
+  target:
+    frame: main
+    tag_hint: td
+    locators:
+    - robustness: header-name addressed; survives row and column reordering
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: table_cell
+      table_anchor: Accounts
+      row_match:
+        column: Product
+        equals: Share Savings
+      column: Current Balance
+    - robustness: positional within the identified row; flags drift when used
+      surfaces:
+      - web
+      - web_legacy
+      kind: xpath_anchored
+      anchor_text: Share Savings
+      xpath: ancestor::tr[1]/td[3]
+    - robustness: recorded viewport only; verified by text under the point; never trusted for unattended
+        replay
+      surfaces:
+      - web
+      - web_legacy
+      - desktop
+      kind: coords_verified
+      x: 689
+      y: 223
+      viewport:
+      - 1280
+      - 800
+      verify_text: ''
+  clear_first: false
+  on_outcome: []
+  extract:
+    output: savings_balance
+    parse: currency_usd
+  mask_in_evidence: false
+checkpoint:
+  all:
+  - frame: main
+    text_contains: Member Detail
+  - output_present: savings_account_number
+  - output_present: savings_balance
+dialogs:
+  policy: fail_on_unknown
+escalation_policy:
+  on_hard_failure: pause
+  on_irreversible_step: require_confirmation
+  handoff_timeout_s: 900
+  max_handoffs: 2

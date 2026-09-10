@@ -1,0 +1,10 @@
+{
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "calls": 7,
+  "input_tokens": 40782,
+  "output_tokens": 291,
+  "thinking_tokens": 528,
+  "cached_input_tokens": 0,
+  "model_wall_ms": 64660
+}

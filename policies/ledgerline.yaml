@@ -24,5 +24,5 @@ redaction:
     ssn: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
     card: "\\b\\d{13,19}\\b"
     account: "\\b\\d{10}\\b"
-    email: "[\\w.+-]+@[\\w-]+\\.[\\w.]+"
+    email: "[\\w.+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,}"
   known_secret_env: [LEDGERLINE_PASS, GEMINI_API_KEY, ANTHROPIC_API_KEY]

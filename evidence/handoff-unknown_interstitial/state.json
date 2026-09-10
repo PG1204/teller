@@ -1,0 +1,57 @@
+{
+  "state": "FINISHED",
+  "controller": "none",
+  "handoffs": 1,
+  "max_handoffs": 2,
+  "pending": null,
+  "history": [
+    {
+      "ts": "2026-09-10T05:55:12+00:00",
+      "from_state": "RUNNING",
+      "to_state": "STUCK_EVALUATING",
+      "controller": "automation",
+      "actor": "automation",
+      "reason": "CHECKPOINT_FAILED"
+    },
+    {
+      "ts": "2026-09-10T05:55:12+00:00",
+      "from_state": "STUCK_EVALUATING",
+      "to_state": "AWAITING_HUMAN",
+      "controller": "none",
+      "actor": "automation",
+      "reason": "after s1 the page changed but the expected state never appeared"
+    },
+    {
+      "ts": "2026-09-10T05:55:12+00:00",
+      "from_state": "AWAITING_HUMAN",
+      "to_state": "HUMAN_IN_CONTROL",
+      "controller": "human",
+      "actor": "operator:demo-operator",
+      "reason": "claim"
+    },
+    {
+      "ts": "2026-09-10T05:55:16+00:00",
+      "from_state": "HUMAN_IN_CONTROL",
+      "to_state": "HANDBACK_VERIFYING",
+      "controller": "automation",
+      "actor": "operator:demo-operator",
+      "reason": "retry_step"
+    },
+    {
+      "ts": "2026-09-10T05:55:16+00:00",
+      "from_state": "HANDBACK_VERIFYING",
+      "to_state": "RUNNING",
+      "controller": "automation",
+      "actor": "automation",
+      "reason": "retry_step"
+    },
+    {
+      "ts": "2026-09-10T05:55:17+00:00",
+      "from_state": "RUNNING",
+      "to_state": "FINISHED",
+      "controller": "none",
+      "actor": "automation",
+      "reason": "success"
+    }
+  ]
+}

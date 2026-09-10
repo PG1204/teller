@@ -1,0 +1,6 @@
+{"kind": "recorder_attached", "ts": "2026-09-10T05:55:12.373Z", "url": "http://127.0.0.1:8600/console", "frame": ""}
+{"kind": "recorder_attached", "ts": "2026-09-10T05:55:12.377Z", "url": "http://127.0.0.1:8600/console/nav", "frame": "nav"}
+{"kind": "recorder_attached", "ts": "2026-09-10T05:55:12.378Z", "url": "http://127.0.0.1:8600/console/members/search", "frame": "main"}
+{"kind": "click", "target": {"tag": "input", "type": "submit", "attrs": {"name": "cmdAttest", "type": "submit"}, "label": null, "text": "I attest", "role": "button"}, "ts": "2026-09-10T05:55:14.012Z", "url": "http://127.0.0.1:8600/console/members/search", "frame": "main"}
+{"kind": "navigate_away", "ts": "2026-09-10T05:55:14.013Z", "url": "http://127.0.0.1:8600/console/members/search", "frame": "main"}
+{"kind": "recorder_attached", "ts": "2026-09-10T05:55:14.018Z", "url": "http://127.0.0.1:8600/console/members/search", "frame": "main"}

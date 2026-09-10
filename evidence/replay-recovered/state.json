@@ -1,0 +1,17 @@
+{
+  "state": "FINISHED",
+  "controller": "none",
+  "handoffs": 0,
+  "max_handoffs": 2,
+  "pending": null,
+  "history": [
+    {
+      "ts": "2026-09-10T05:54:59+00:00",
+      "from_state": "RUNNING",
+      "to_state": "FINISHED",
+      "controller": "none",
+      "actor": "automation",
+      "reason": "success"
+    }
+  ]
+}

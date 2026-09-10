@@ -81,7 +81,10 @@ def build_target(el: Element, params: dict[str, str], *, for_read: bool = False)
         name = ""
         text = key
 
-    if el.role in ARIA_ROLES_FOR_LOCATOR and name and not (el.role in ("cell", "row") and el.table):
+    # A name derived from a sibling <td> or preceding text is OUR heuristic, not an ARIA accessible
+    # name: Playwright's role engine will not see it, so role_name would never resolve for such controls.
+    geometric_label = is_control and el.label is not None and el.label_relation not in (None, "label_for")
+    if el.role in ARIA_ROLES_FOR_LOCATOR and name and not (el.role in ("cell", "row") and el.table) and not geometric_label:
         locs.append(
             RoleNameLocator(
                 role=el.role, name=name,

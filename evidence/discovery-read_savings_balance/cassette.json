@@ -1,0 +1,66 @@
+{
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "turns": [
+    {
+      "observation_hash": "41a524a91f37fabb",
+      "tool": "click",
+      "args": {
+        "mark_id": 5,
+        "intent": "Navigate to Member Search to look up member 10001."
+      }
+    },
+    {
+      "observation_hash": "1778b11d3674cfe1",
+      "tool": "type_text",
+      "args": {
+        "intent": "Enter member number 10001 into Member # field.",
+        "mark_id": 5,
+        "text": "10001"
+      }
+    },
+    {
+      "observation_hash": "55e1c10af9a25cc2",
+      "tool": "click",
+      "args": {
+        "intent": "Click Go button to search for member 10001.",
+        "mark_id": 7
+      }
+    },
+    {
+      "observation_hash": "9bdc39efb5ae63c9",
+      "tool": "click",
+      "args": {
+        "intent": "Click member result row to view member profile.",
+        "mark_id": 8
+      }
+    },
+    {
+      "observation_hash": "17453b67ee8bf62d",
+      "tool": "read_value",
+      "args": {
+        "output_name": "savings_account_number",
+        "intent": "Read the Share Savings account number.",
+        "mark_id": 10
+      }
+    },
+    {
+      "observation_hash": "c71ae6c43e9c5470",
+      "tool": "read_value",
+      "args": {
+        "intent": "Read the Share Savings current balance.",
+        "output_name": "savings_balance",
+        "mark_id": 11
+      }
+    },
+    {
+      "observation_hash": "24f956771f20037d",
+      "tool": "done",
+      "args": {
+        "intent": "Completed lookup and reading of Share Savings account number and balance for member 10001.",
+        "checkpoint_text": "Member Detail",
+        "summary": "Successfully looked up member 10001 and read the current balance and account number for their Share Savings account."
+      }
+    }
+  ]
+}

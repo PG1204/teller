@@ -59,8 +59,8 @@ capabilities/<id>@<ver>.yaml  the flow: params, outputs, business_outcomes, reco
 tenants/<tenant>.yaml         base_url, credential env names, policy, app_version, sparse overrides
 ```
 
-Excerpt (`capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml`, emitted by the real run,
-then reviewed):
+Excerpt (`capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml`, emitted by the real Gemini run,
+then reviewed — draft and reviewed copies side by side in `evidence/capabilities/`):
 
 ```yaml
 params:   { member_id: { type: string, pattern: "^[0-9]{5}$", classification: pii_low } }
@@ -72,7 +72,6 @@ business_outcomes:                       # AUTHORED IN REVIEW — a happy-path r
 steps:
   - id: s2, action: type, intent: Enter the member number, idempotent: true, risk_class: read
     target: { frame: main, text_hint: "Member #", locators:
-      - { kind: role_name,    role: textbox, name: "Member #",  robustness: "accessible name; survives branding" }
       - { kind: label_anchor, label: "Member #", relation: same_row_right, control: text_input,
           robustness: "legacy tables carry no <label for>; the adjacent-cell label is what vendors keep stable" }
       - { kind: attr_stable,  attr: name, value: txtF1, robustness: "cryptic but stable within this build" }
@@ -229,4 +228,38 @@ post-action URL check do the work today.
 
 ## 7. Cuts
 
-_Filled in after the real discovery run and the evidence pass._
+**What was cut, and why.**
+
+- *Model provider for the run.* The discovery run was done on Gemini's free tier (`gemini-3.6-flash`)
+  rather than Claude. The model was never the problem — in all three attempts it chose the right
+  control every turn and typed the parameter placeholder — the free tier's quota was: 5 requests per
+  minute and 20 per day per model. The loop now paces itself to the quota and honours the server's
+  retry delay; the two earlier attempts on `gemini-3.8-flash` completed all six actions and were cut
+  off one call before `done`. Switching to Anthropic is a flag (`--provider anthropic`); nothing else
+  changes.
+- *Only one flow discovered.* The brief's "open a sub-account" flow (a `reversible_write` with a
+  native `confirm()`) and the refuse-only "post transaction" flow (`irreversible_write`) are exercised
+  by the mock and the policy tests but were not discovered with the model, to spend the daily quota
+  on a clean hero run. The risk-class path is proven by unit tests and by the replay engine's
+  `ConfirmationRequired` handling, not by evidence of a model being refused.
+- *Network-level route fence* (`page.route` aborting off-allowlist requests) is designed, not built;
+  the gate plus the post-action URL check cover the allowlist today.
+- *Operator console* is one static page over the file channel; no CDP/noVNC embedding.
+- *Desktop surface* is a typed mapping in §4, not code. *Tenant health scoring* is designed only.
+- *`coords_verified`* is emitted as a last-resort strategy but the resolver treats it as untrusted;
+  it never resolved in any run.
+
+**What broke during the evidence pass and what it taught.** The first replay of the discovered
+artifact fell back on step 2: Playwright's accessibility engine does not consider a sibling-cell label
+an accessible name, so a `role_name` strategy for a legacy input can never resolve. The recorder now
+skips `role_name` for geometrically labelled controls; the reviewed artifact records the removal in
+`review.notes`. The recovered and handoff runs then surfaced a second rule that belongs in the
+engine: after a remedy or a handback, if a step's postcondition already holds, the step is complete
+— re-acting would look for a control that is legitimately gone. Both fixes are covered by the live
+integration suite.
+
+**Next, in order.** (1) The irreversible flow discovered with the model and its refusal recorded as
+evidence. (2) `page.route` fence. (3) A second tenant skin of the mock to demonstrate
+`locators_prepend` overrides end to end with a real relabel. (4) Health scoring from `index_used`
+across runs. (5) The agent-facing catalogue: project each approved capability's params/outputs into
+a tool definition — the result contract and exit codes already are the interface.

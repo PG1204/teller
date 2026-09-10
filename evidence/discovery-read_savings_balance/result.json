@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "run_id": "disc_2026-09-10T05-11-24_243d",
+  "mode": "discovery",
+  "capability": {
+    "id": "ledgerline.member.read_savings_balance",
+    "version": "1.0.0",
+    "status": "draft"
+  },
+  "goal": "Look up member 10001 and read the current balance and account number of their Share Savings account",
+  "tenant": "local",
+  "params": {
+    "member_id": "10001"
+  },
+  "recoveries": [],
+  "warnings": [],
+  "steps": [
+    {
+      "step_id": "s1",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "mark",
+      "duration_ms": 97,
+      "screenshot": "screenshots/turn_01.jpg",
+      "note": "Navigate to Member Search to look up member 10001."
+    },
+    {
+      "step_id": "s2",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "mark",
+      "duration_ms": 56,
+      "screenshot": "screenshots/turn_02.jpg",
+      "note": "Enter member number 10001 into Member # field."
+    },
+    {
+      "step_id": "s3",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "mark",
+      "duration_ms": 78,
+      "screenshot": "screenshots/turn_03.jpg",
+      "note": "Click Go button to search for member 10001."
+    },
+    {
+      "step_id": "s4",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "mark",
+      "duration_ms": 90,
+      "screenshot": "screenshots/turn_04.jpg",
+      "note": "Click member result row to view member profile."
+    },
+    {
+      "step_id": "s5",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "mark",
+      "duration_ms": 56,
+      "screenshot": "screenshots/turn_05.jpg",
+      "note": "Read the Share Savings account number."
+    },
+    {
+      "step_id": "s6",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "mark",
+      "duration_ms": 53,
+      "screenshot": "screenshots/turn_06.jpg",
+      "note": "Read the Share Savings current balance."
+    }
+  ],
+  "handoffs": [],
+  "evidence_dir": "runs/disc_2026-09-10T05-11-24_243d",
+  "timing": {
+    "started_at": "2026-09-10T05:14:03+00:00",
+    "finished_at": "2026-09-10T05:14:03+00:00",
+    "duration_ms": 159071,
+    "paused_ms": 0
+  },
+  "llm_invoked": true,
+  "policy_sha256": "6377f8a4792d6651c7059e06ba7df7726916e6e54d8890f149d5513c02bdd7ce",
+  "artifact_path": "/Users/prateekganigi/Documents/Projects/interface ai - THA/capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml",
+  "status": "success",
+  "outputs": {
+    "savings_account_number": "****1982",
+    "savings_balance": "$2,431.17"
+  }
+}

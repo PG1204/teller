@@ -53,8 +53,8 @@ handoff-demo:
 approve:
 	$(TELLER) approve capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --by "$(USER)"
 
-evidence:
-	$(TELLER) evidence export --help
+evidence:            # regenerate evidence/ (mock must be running); pass DISC=<discovery run id> to include it
+	scripts/evidence.sh $(DISC)
 
 clean:
 	rm -rf runs/ .pytest_cache .ruff_cache

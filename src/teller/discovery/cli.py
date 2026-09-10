@@ -10,8 +10,6 @@ import typer
 
 from teller.discovery.emit import OutputDecl, ParamDecl
 
-app = typer.Typer(no_args_is_help=False, add_completion=False)
-
 
 def parse_kv(items: list[str]) -> dict[str, str]:
     out: dict[str, str] = {}
@@ -57,7 +55,6 @@ def parse_param_decl(items: list[str]) -> dict[str, ParamDecl]:
     return out
 
 
-@app.callback(invoke_without_command=True)
 def discover(
     goal: str = typer.Option(..., "--goal", help="Natural-language goal for the target app."),
     tenant: str = typer.Option("local", "--tenant"),

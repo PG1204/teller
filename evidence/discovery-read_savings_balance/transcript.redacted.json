@@ -1,0 +1,208 @@
+{
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "screenshots": [
+    "screenshots/turn_01.jpg",
+    "screenshots/turn_02.jpg",
+    "screenshots/turn_03.jpg",
+    "screenshots/turn_04.jpg",
+    "screenshots/turn_05.jpg",
+    "screenshots/turn_06.jpg",
+    "screenshots/turn_07.jpg"
+  ],
+  "turns": [
+    {
+      "role": "user",
+      "text": "GOAL: Look up member 10001 and read the current balance and account number of their Share Savings account\n\nPARAMETERS (typed inputs supplied for this run):\n  - member_id = 10001   (placeholder: {member_id})\n\nOUTPUTS to record with read_value (use exactly these names):\n  - savings_balance: savings balance\n  - savings_account_number: savings account number\n\nBegin. Observe the screen and take the first action."
+    },
+    {
+      "role": "user",
+      "feedback": null,
+      "observation": "TURN 1\nURL: http://127.0.0.1:8600/console/home\nTitle: Ledgerline Credit Union - Member Servicing Console\nFrames: top, nav, main\nHTTP status (main): 200\n\nELEMENTS (act by mark id):\n[1] link 'Home' frame=nav\n[2] link 'Members' frame=nav\n[3] link 'Reports' frame=nav\n[4] link 'Sign Out' frame=nav\n[5] link 'Member Search' frame=main\n[6] link 'Reports' frame=main\n\nVISIBLE TEXT (main): Ledgerline Credit Union Member Servicing Console | Welcome, <secret> 09/09/2026 | Servicing | Member Search Locate a member by number or last name. | Reports Branch reporting. | Announcements | Core batch window is 22:00-23:30. Postings after 21:45 settle next business day. | Ledgerline Credit Union \u2022 Internal use only \u2022 Build 4.2.117",
+      "screenshot": true,
+      "observation_hash": "41a524a91f37fabb"
+    },
+    {
+      "role": "model",
+      "tool": "click",
+      "args": {
+        "mark_id": 5,
+        "intent": "Navigate to Member Search to look up member 10001."
+      },
+      "text": null,
+      "finish_reason": "FinishReason.STOP",
+      "usage": {
+        "prompt_tokens": 3265,
+        "output_tokens": 34,
+        "thinking_tokens": 120
+      },
+      "latency_ms": 16124
+    },
+    {
+      "role": "user",
+      "feedback": {
+        "tool": "click",
+        "ok": true,
+        "text": "click on [5] link 'Member Search'; the page changed"
+      },
+      "observation": "TURN 2\nURL: http://127.0.0.1:8600/console/members/search\nTitle: Ledgerline Credit Union - Member Servicing Console\nFrames: top, nav, main\nHTTP status (main): 200\n\nELEMENTS (act by mark id):\n[1] link 'Home' frame=nav\n[2] link 'Members' frame=nav\n[3] link 'Reports' frame=nav\n[4] link 'Sign Out' frame=nav\n[5] textbox 'Member #' type=text frame=main\n[6] textbox 'Last Name' type=text frame=main\n[7] button 'Go' type=image frame=main\n\nVISIBLE TEXT (main): Ledgerline Credit Union Member Servicing Console | Member Search | Member # | Last Name | Enter a member number for an exact match, or the first letters of a last name. | Ledgerline Credit Union \u2022 Internal use only \u2022 Build 4.2.117",
+      "screenshot": true,
+      "observation_hash": "1778b11d3674cfe1"
+    },
+    {
+      "role": "model",
+      "tool": "type_text",
+      "args": {
+        "intent": "Enter member number 10001 into Member # field.",
+        "mark_id": 5,
+        "text": "10001"
+      },
+      "text": null,
+      "finish_reason": "FinishReason.STOP",
+      "usage": {
+        "prompt_tokens": 4755,
+        "output_tokens": 45,
+        "thinking_tokens": 24
+      },
+      "latency_ms": 13503
+    },
+    {
+      "role": "user",
+      "feedback": {
+        "tool": "type_text",
+        "ok": true,
+        "text": "type_text on [5] textbox 'Member #'"
+      },
+      "observation": "TURN 3\nURL: http://127.0.0.1:8600/console/members/search\nTitle: Ledgerline Credit Union - Member Servicing Console\nFrames: top, nav, main\nHTTP status (main): 200\n\nELEMENTS (act by mark id):\n[1] link 'Home' frame=nav\n[2] link 'Members' frame=nav\n[3] link 'Reports' frame=nav\n[4] link 'Sign Out' frame=nav\n[5] textbox 'Member #' text='10001' type=text frame=main\n[6] textbox 'Last Name' type=text frame=main\n[7] button 'Go' type=image frame=main\n\nVISIBLE TEXT (main): Ledgerline Credit Union Member Servicing Console | Member Search | Member # | Last Name | Enter a member number for an exact match, or the first letters of a last name. | Ledgerline Credit Union \u2022 Internal use only \u2022 Build 4.2.117",
+      "screenshot": true,
+      "observation_hash": "55e1c10af9a25cc2"
+    },
+    {
+      "role": "model",
+      "tool": "click",
+      "args": {
+        "intent": "Click Go button to search for member 10001.",
+        "mark_id": 7
+      },
+      "text": null,
+      "finish_reason": "FinishReason.STOP",
+      "usage": {
+        "prompt_tokens": 5082,
+        "output_tokens": 33,
+        "thinking_tokens": 10
+      },
+      "latency_ms": 3311
+    },
+    {
+      "role": "user",
+      "feedback": {
+        "tool": "click",
+        "ok": true,
+        "text": "click on [7] button 'Go'; the page changed"
+      },
+      "observation": "TURN 4\nURL: http://127.0.0.1:8600/console/members/results?txtF1=10001&txtF2=&cmdGo.x=30&cmdGo.y=11\nTitle: Ledgerline Credit Union - Member Servicing Console\nFrames: top, nav, main\nHTTP status (main): 200\n\nELEMENTS (act by mark id):\n[1] link 'Home' frame=nav\n[2] link 'Members' frame=nav\n[3] link 'Reports' frame=nav\n[4] link 'Sign Out' frame=nav\n[5] columnheader 'Member #' cell(Search Results: None / Member #) frame=main\n[6] columnheader 'Name' cell(Search Results: None / Name) frame=main\n[7] columnheader 'Status' cell(Search Results: None / Status) frame=main\n[8] row '10001 Dana Whitfield Active' frame=main\n[9] cell '10001' cell(Search Results: 10001 / Member #) frame=main\n[10] cell 'Dana Whitfield' cell(Search Results: 10001 / Name) frame=main\n[11] cell 'Active' cell(Search Results: 10001 / Status) frame=main\n[12] link '\u00ab New Search' frame=main\n\nVISIBLE TEXT (main): Ledgerline Credit Union Member Servicing Console | Search Results | Member # Name Status | 10001 Dana Whitfield Active | \u00ab New Search | Ledgerline Credit Union \u2022 Internal use only \u2022 Build 4.2.117",
+      "screenshot": true,
+      "observation_hash": "9bdc39efb5ae63c9"
+    },
+    {
+      "role": "model",
+      "tool": "click",
+      "args": {
+        "intent": "Click member result row to view member profile.",
+        "mark_id": 8
+      },
+      "text": null,
+      "finish_reason": "FinishReason.STOP",
+      "usage": {
+        "prompt_tokens": 5537,
+        "output_tokens": 28,
+        "thinking_tokens": 146
+      },
+      "latency_ms": 2548
+    },
+    {
+      "role": "user",
+      "feedback": {
+        "tool": "click",
+        "ok": true,
+        "text": "click on [8] row '10001 Dana Whitfield Active'; the page changed"
+      },
+      "observation": "TURN 5\nURL: http://127.0.0.1:8600/console/members/10001\nTitle: Ledgerline Credit Union - Member Servicing Console\nFrames: top, nav, main\nHTTP status (main): 200\n\nELEMENTS (act by mark id):\n[1] link 'Home' frame=nav\n[2] link 'Members' frame=nav\n[3] link 'Reports' frame=nav\n[4] link 'Sign Out' frame=nav\n[5] columnheader 'Product' cell(Accounts: None / Product) frame=main\n[6] columnheader 'Account #' cell(Accounts: None / Account #) frame=main\n[7] columnheader 'Current Balance' cell(Accounts: None / Current Balance) frame=main\n[8] columnheader 'Opened' cell(Accounts: None / Opened) frame=main\n[9] cell 'Share Savings' cell(Accounts: Share Savings / Product) frame=main\n[10] cell '<account>' cell(Accounts: Share Savings / Account #) SENSITIVE frame=main\n[11] cell '$2,431.17' cell(Accounts: Share Savings / Current Balance) frame=main\n[12] cell '03/02/2014' cell(Accounts: Share Savings / Opened) frame=main\n[13] cell 'Checking' cell(Accounts: Checking / Product) frame=main\n[14] cell '<account>' cell(Accounts: Checking / Account #) SENSITIVE frame=main\n[15] cell '$812.40' cell(Accounts: Checking / Current Balance) frame=main\n[16] cell '03/02/2014' cell(Accounts: Checking / Opened) frame=main\n[17] cell 'Holiday Club' cell(Accounts: Holiday Club / Product) frame=main\n[18] cell '<account>' cell(Accounts: Holiday Club / Account #) SENSITIVE frame=main\n[19] cell '$150.00' cell(Accounts: Holiday Club / Current Balance) frame=main\n[20] cell '11/15/2021' cell(Accounts: Holiday Club / Opened) frame=main\n[21] link 'Open Sub-Account' frame=main\n[22] link 'Post Transaction' frame=main\n[23] link 'Member Search' frame=main\n\nVISIBLE TEXT (main): Ledgerline Credit Union Member Servicing Console | Member Detail | Member # 10001 | Name Dana Whitfield | Status Active | SSN (last 4) ***-**-4821 | Accounts | Product Account # Current Balance Opened | Share Savings <account> $2,431.17 03/02/2014 | Checking <account> $812.40 03/02/2014 | Holiday Club <account> $150.00 11/15/2021 | Open Sub-Account | Post Transaction | Member Search | Ledgerline Credit Union \u2022 Internal use only \u2022 Build 4.2.117",
+      "screenshot": true,
+      "observation_hash": "17453b67ee8bf62d"
+    },
+    {
+      "role": "model",
+      "tool": "read_value",
+      "args": {
+        "output_name": "savings_account_number",
+        "intent": "Read the Share Savings account number.",
+        "mark_id": 10
+      },
+      "text": null,
+      "finish_reason": "FinishReason.STOP",
+      "usage": {
+        "prompt_tokens": 6462,
+        "output_tokens": 41,
+        "thinking_tokens": 155
+      },
+      "latency_ms": 2161
+    },
+    {
+      "role": "user",
+      "feedback": {
+        "tool": "read_value",
+        "ok": true,
+        "text": "read_value on [10] cell '<account>' -> recorded output savings_account_number = '<masked>'"
+      },
+      "observation": "TURN 6\nURL: http://127.0.0.1:8600/console/members/10001\nTitle: Ledgerline Credit Union - Member Servicing Console\nFrames: top, nav, main\nHTTP status (main): 200\n\nELEMENTS (act by mark id):\n[1] link 'Home' frame=nav\n[2] link 'Members' frame=nav\n[3] link 'Reports' frame=nav\n[4] link 'Sign Out' frame=nav\n[5] columnheader 'Product' cell(Accounts: None / Product) frame=main\n[6] columnheader 'Account #' cell(Accounts: None / Account #) frame=main\n[7] columnheader 'Current Balance' cell(Accounts: None / Current Balance) frame=main\n[8] columnheader 'Opened' cell(Accounts: None / Opened) frame=main\n[9] cell 'Share Savings' cell(Accounts: Share Savings / Product) frame=main\n[10] cell '****1982' cell(Accounts: Share Savings / Account #) SENSITIVE frame=main\n[11] cell '$2,431.17' cell(Accounts: Share Savings / Current Balance) frame=main\n[12] cell '03/02/2014' cell(Accounts: Share Savings / Opened) frame=main\n[13] cell 'Checking' cell(Accounts: Checking / Product) frame=main\n[14] cell '<account>' cell(Accounts: Checking / Account #) SENSITIVE frame=main\n[15] cell '$812.40' cell(Accounts: Checking / Current Balance) frame=main\n[16] cell '03/02/2014' cell(Accounts: Checking / Opened) frame=main\n[17] cell 'Holiday Club' cell(Accounts: Holiday Club / Product) frame=main\n[18] cell '<account>' cell(Accounts: Holiday Club / Account #) SENSITIVE frame=main\n[19] cell '$150.00' cell(Accounts: Holiday Club / Current Balance) frame=main\n[20] cell '11/15/2021' cell(Accounts: Holiday Club / Opened) frame=main\n[21] link 'Open Sub-Account' frame=main\n[22] link 'Post Transaction' frame=main\n[23] link 'Member Search' frame=main\n\nVISIBLE TEXT (main): Ledgerline Credit Union Member Servicing Console | Member Detail | Member # 10001 | Name Dana Whitfield | Status Active | SSN (last 4) ***-**-4821 | Accounts | Product Account # Current Balance Opened | Share Savings ****1982 $2,431.17 03/02/2014 | Checking <account> $812.40 03/02/2014 | Holiday Club <account> $150.00 11/15/2021 | Open Sub-Account | Post Transaction | Member Search | Ledgerline Credit Union \u2022 Internal use only \u2022 Build 4.2.117",
+      "screenshot": true,
+      "observation_hash": "c71ae6c43e9c5470"
+    },
+    {
+      "role": "model",
+      "tool": "read_value",
+      "args": {
+        "intent": "Read the Share Savings current balance.",
+        "output_name": "savings_balance",
+        "mark_id": 11
+      },
+      "text": null,
+      "finish_reason": "FinishReason.STOP",
+      "usage": {
+        "prompt_tokens": 7421,
+        "output_tokens": 39,
+        "thinking_tokens": 25
+      },
+      "latency_ms": 24180
+    },
+    {
+      "role": "user",
+      "feedback": {
+        "tool": "read_value",
+        "ok": true,
+        "text": "read_value on [11] cell '$2,431.17' -> recorded output savings_balance = '$2,431.17'"
+      },
+      "observation": "TURN 7\nURL: http://127.0.0.1:8600/console/members/10001\nTitle: Ledgerline Credit Union - Member Servicing Console\nFrames: top, nav, main\nHTTP status (main): 200\n\nELEMENTS (act by mark id):\n[1] link 'Home' frame=nav\n[2] link 'Members' frame=nav\n[3] link 'Reports' frame=nav\n[4] link 'Sign Out' frame=nav\n[5] columnheader 'Product' cell(Accounts: None / Product) frame=main\n[6] columnheader 'Account #' cell(Accounts: None / Account #) frame=main\n[7] columnheader 'Current Balance' cell(Accounts: None / Current Balance) frame=main\n[8] columnheader 'Opened' cell(Accounts: None / Opened) frame=main\n[9] cell 'Share Savings' cell(Accounts: Share Savings / Product) frame=main\n[10] cell '****1982' cell(Accounts: Share Savings / Account #) SENSITIVE frame=main\n[11] cell '$2,431.17' cell(Accounts: Share Savings / Current Balance) frame=main\n[12] cell '03/02/2014' cell(Accounts: Share Savings / Opened) frame=main\n[13] cell 'Checking' cell(Accounts: Checking / Product) frame=main\n[14] cell '<account>' cell(Accounts: Checking / Account #) SENSITIVE frame=main\n[15] cell '$812.40' cell(Accounts: Checking / Current Balance) frame=main\n[16] cell '03/02/2014' cell(Accounts: Checking / Opened) frame=main\n[17] cell 'Holiday Club' cell(Accounts: Holiday Club / Product) frame=main\n[18] cell '<account>' cell(Accounts: Holiday Club / Account #) SENSITIVE frame=main\n[19] cell '$150.00' cell(Accounts: Holiday Club / Current Balance) frame=main\n[20] cell '11/15/2021' cell(Accounts: Holiday Club / Opened) frame=main\n[21] link 'Open Sub-Account' frame=main\n[22] link 'Post Transaction' frame=main\n[23] link 'Member Search' frame=main\n\nVISIBLE TEXT (main): Ledgerline Credit Union Member Servicing Console | Member Detail | Member # 10001 | Name Dana Whitfield | Status Active | SSN (last 4) ***-**-4821 | Accounts | Product Account # Current Balance Opened | Share Savings ****1982 $2,431.17 03/02/2014 | Checking <account> $812.40 03/02/2014 | Holiday Club <account> $150.00 11/15/2021 | Open Sub-Account | Post Transaction | Member Search | Ledgerline Credit Union \u2022 Internal use only \u2022 Build 4.2.117",
+      "screenshot": true,
+      "observation_hash": "24f956771f20037d"
+    },
+    {
+      "role": "model",
+      "tool": "done",
+      "args": {
+        "intent": "Completed lookup and reading of Share Savings account number and balance for member 10001.",
+        "checkpoint_text": "Member Detail",
+        "summary": "Successfully looked up member 10001 and read the current balance and account number for their Share Savings account."
+      },
+      "text": null,
+      "finish_reason": "FinishReason.STOP",
+      "usage": {
+        "prompt_tokens": 8260,
+        "output_tokens": 71,
+        "thinking_tokens": 48
+      },
+      "latency_ms": 2833
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "run_id": "rep_2026-09-10T05-54-51_51c2",
+  "mode": "replay",
+  "capability": {
+    "id": "ledgerline.member.read_savings_balance",
+    "version": "1.0.0",
+    "status": "draft"
+  },
+  "tenant": "local",
+  "params": {
+    "member_id": "10001"
+  },
+  "recoveries": [
+    {
+      "code": "INTERSTITIAL_DISMISSED",
+      "condition_id": "compliance_notice",
+      "step_id": "s1",
+      "times": 1
+    },
+    {
+      "code": "SLOW_LOAD_WAITED",
+      "condition_id": "slow_load",
+      "step_id": "s1",
+      "times": 1
+    }
+  ],
+  "warnings": [],
+  "steps": [
+    {
+      "step_id": "s1",
+      "status": "ok",
+      "duration_ms": 0,
+      "screenshot": "screenshots/s1_after.jpg",
+      "note": "postcondition already held after recovery"
+    },
+    {
+      "step_id": "s2",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "label_anchor",
+      "duration_ms": 165,
+      "screenshot": "screenshots/s2_after.jpg"
+    },
+    {
+      "step_id": "s3",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "role_name",
+      "duration_ms": 183,
+      "screenshot": "screenshots/s3_after.jpg"
+    },
+    {
+      "step_id": "s4",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "text_exact",
+      "duration_ms": 217,
+      "screenshot": "screenshots/s4_after.jpg"
+    },
+    {
+      "step_id": "s5",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "table_cell",
+      "duration_ms": 116,
+      "screenshot": "screenshots/s5_after.jpg"
+    },
+    {
+      "step_id": "s6",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "table_cell",
+      "duration_ms": 116,
+      "screenshot": "screenshots/s6_after.jpg"
+    }
+  ],
+  "handoffs": [],
+  "evidence_dir": "runs/rep_2026-09-10T05-54-51_51c2",
+  "timing": {
+    "started_at": "2026-09-10T05:54:51+00:00",
+    "finished_at": "2026-09-10T05:54:59+00:00",
+    "duration_ms": 8336,
+    "paused_ms": 0
+  },
+  "llm_invoked": false,
+  "policy_sha256": "8f73ba772584510509c637d2ac2dded7ee09595c34a2ba29771f6f66b4fedd06",
+  "artifact_path": "capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml",
+  "status": "success",
+  "outputs": {
+    "savings_account_number": "****1982",
+    "savings_balance": "2431.17"
+  }
+}

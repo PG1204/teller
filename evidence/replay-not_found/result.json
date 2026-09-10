@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "run_id": "rep_2026-09-10T05-54-43_4180",
+  "mode": "replay",
+  "capability": {
+    "id": "ledgerline.member.read_savings_balance",
+    "version": "1.0.0",
+    "status": "draft"
+  },
+  "tenant": "local",
+  "params": {
+    "member_id": "20002"
+  },
+  "recoveries": [],
+  "warnings": [],
+  "steps": [
+    {
+      "step_id": "s1",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "role_name",
+      "duration_ms": 197,
+      "screenshot": "screenshots/s1_after.jpg"
+    },
+    {
+      "step_id": "s2",
+      "status": "ok",
+      "index_used": 0,
+      "locator_kind": "label_anchor",
+      "duration_ms": 150,
+      "screenshot": "screenshots/s2_after.jpg"
+    }
+  ],
+  "handoffs": [],
+  "evidence_dir": "runs/rep_2026-09-10T05-54-43_4180",
+  "timing": {
+    "started_at": "2026-09-10T05:54:43+00:00",
+    "finished_at": "2026-09-10T05:54:45+00:00",
+    "duration_ms": 1171,
+    "paused_ms": 0
+  },
+  "llm_invoked": false,
+  "policy_sha256": "8f73ba772584510509c637d2ac2dded7ee09595c34a2ba29771f6f66b4fedd06",
+  "artifact_path": "capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml",
+  "status": "business_outcome",
+  "outcome": {
+    "code": "MEMBER_NOT_FOUND",
+    "step_id": "s3",
+    "message": "No member exists with that member_id",
+    "returns": {
+      "member_id": "20002"
+    }
+  }
+}

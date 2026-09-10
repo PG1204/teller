@@ -1,0 +1,147 @@
+{
+  "state": "FINISHED",
+  "controller": "none",
+  "handoffs": 0,
+  "max_handoffs": 2,
+  "pending": {
+    "intervention_id": "int_7ea88b74",
+    "run_id": "rep_2026-09-10T05-54-49_f720",
+    "mode": "replay",
+    "capability_id": "ledgerline.member.read_savings_balance",
+    "step_id": "s1",
+    "intent": "Navigate to Member Search to look up member 10001.",
+    "trigger": "APP_ERROR",
+    "reason": "detector 'app_error' fired at s1 with no declared disposition",
+    "url": "http://127.0.0.1:8600/console/members/search",
+    "screenshot": "screenshots/s1_escalation.jpg",
+    "last_events": [
+      {
+        "ts": "2026-09-10T05:54:50+00:00",
+        "run_id": "rep_2026-09-10T05-54-49_f720",
+        "mode": "replay",
+        "controller": "automation",
+        "type": "login",
+        "actor": "automation",
+        "payload": {
+          "ok": true
+        }
+      },
+      {
+        "ts": "2026-09-10T05:54:50+00:00",
+        "run_id": "rep_2026-09-10T05-54-49_f720",
+        "mode": "replay",
+        "controller": "automation",
+        "type": "policy_check",
+        "actor": "automation",
+        "payload": {
+          "surface": "policy_check",
+          "action": "click",
+          "allowed": true,
+          "risk_class": "read",
+          "confirm_required": false,
+          "reason": "click on a non-submitting control",
+          "target": "[0] link 'Member Search' frame=main"
+        }
+      },
+      {
+        "ts": "2026-09-10T05:54:50+00:00",
+        "run_id": "rep_2026-09-10T05-54-49_f720",
+        "mode": "replay",
+        "controller": "automation",
+        "type": "act",
+        "actor": "automation",
+        "payload": {
+          "surface": "act",
+          "action": "click",
+          "ok": true,
+          "navigated": true,
+          "dialog_opened": false,
+          "duration_ms": 90,
+          "note": null,
+          "risk_class": "read",
+          "kind": "role_name",
+          "index_used": 0
+        }
+      },
+      {
+        "ts": "2026-09-10T05:54:50+00:00",
+        "run_id": "rep_2026-09-10T05-54-49_f720",
+        "mode": "replay",
+        "controller": "automation",
+        "type": "condition_detected",
+        "step_id": "s1",
+        "actor": "automation",
+        "payload": {
+          "kind": "undeclared",
+          "code": "app_error",
+          "message": "detector 'app_error' fired at s1 with no declared disposition",
+          "observed": {
+            "url": "http://127.0.0.1:8600/console/members/search",
+            "title": "Ledgerline Credit Union - Member Servicing Console",
+            "http_status": 500,
+            "dialog": null,
+            "visible_text_head": "Menu \u00bb Home \u00bb Members \u00bb Reports Signed in as <secret> \u00bb Sign Out Ledgerline Credit Union Member Servicing Console Application Error Application Error ORA-00600: internal error code Module: LLSERV.CONS",
+            "detector_hits": [],
+            "element_count": 4
+          }
+        }
+      },
+      {
+        "ts": "2026-09-10T05:54:50+00:00",
+        "run_id": "rep_2026-09-10T05-54-49_f720",
+        "mode": "replay",
+        "controller": "automation",
+        "type": "error",
+        "step_id": "s1",
+        "actor": "automation",
+        "payload": {
+          "code": "APP_ERROR",
+          "message": "detector 'app_error' fired at s1 with no declared disposition",
+          "expected": null,
+          "observed": {
+            "url": "http://127.0.0.1:8600/console/members/search",
+            "title": "Ledgerline Credit Union - Member Servicing Console",
+            "http_status": 500,
+            "dialog": null,
+            "visible_text_head": "Menu \u00bb Home \u00bb Members \u00bb Reports Signed in as <secret> \u00bb Sign Out Ledgerline Credit Union Member Servicing Console Application Error Application Error ORA-00600: internal error code Module: LLSERV.CONS",
+            "detector_hits": [],
+            "element_count": 4
+          }
+        }
+      }
+    ],
+    "allowed_resolutions": [
+      "retry_step",
+      "skip_step",
+      "complete",
+      "abort"
+    ],
+    "created_at": "2026-09-10T05:54:50+00:00"
+  },
+  "history": [
+    {
+      "ts": "2026-09-10T05:54:50+00:00",
+      "from_state": "RUNNING",
+      "to_state": "STUCK_EVALUATING",
+      "controller": "automation",
+      "actor": "automation",
+      "reason": "APP_ERROR"
+    },
+    {
+      "ts": "2026-09-10T05:54:50+00:00",
+      "from_state": "STUCK_EVALUATING",
+      "to_state": "AWAITING_HUMAN",
+      "controller": "none",
+      "actor": "automation",
+      "reason": "detector 'app_error' fired at s1 with no declared disposition"
+    },
+    {
+      "ts": "2026-09-10T05:54:50+00:00",
+      "from_state": "AWAITING_HUMAN",
+      "to_state": "FINISHED",
+      "controller": "none",
+      "actor": "automation",
+      "reason": "failure"
+    }
+  ]
+}

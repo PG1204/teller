@@ -1,0 +1,119 @@
+{
+  "intervention_id": "int_a7374b43",
+  "run_id": "rep_2026-09-10T05-55-03_d126",
+  "mode": "replay",
+  "capability_id": "ledgerline.member.read_savings_balance",
+  "step_id": "s1",
+  "intent": "Navigate to Member Search to look up member 10001.",
+  "trigger": "CHECKPOINT_FAILED",
+  "reason": "after s1 the page changed but the expected state never appeared",
+  "url": "http://127.0.0.1:8600/console/members/search",
+  "screenshot": "screenshots/s1_escalation.jpg",
+  "last_events": [
+    {
+      "ts": "2026-09-10T05:55:03+00:00",
+      "run_id": "rep_2026-09-10T05-55-03_d126",
+      "mode": "replay",
+      "controller": "automation",
+      "type": "act",
+      "actor": "automation",
+      "payload": {
+        "surface": "act",
+        "action": "click",
+        "ok": true,
+        "navigated": true,
+        "dialog_opened": false,
+        "duration_ms": 72,
+        "note": null,
+        "risk_class": "read",
+        "kind": "role_name",
+        "index_used": 0
+      }
+    },
+    {
+      "ts": "2026-09-10T05:55:03+00:00",
+      "run_id": "rep_2026-09-10T05-55-03_d126",
+      "mode": "replay",
+      "controller": "automation",
+      "type": "login",
+      "actor": "automation",
+      "payload": {
+        "ok": true
+      }
+    },
+    {
+      "ts": "2026-09-10T05:55:03+00:00",
+      "run_id": "rep_2026-09-10T05-55-03_d126",
+      "mode": "replay",
+      "controller": "automation",
+      "type": "policy_check",
+      "actor": "automation",
+      "payload": {
+        "surface": "policy_check",
+        "action": "click",
+        "allowed": true,
+        "risk_class": "read",
+        "confirm_required": false,
+        "reason": "click on a non-submitting control",
+        "target": "[0] link 'Member Search' frame=main"
+      }
+    },
+    {
+      "ts": "2026-09-10T05:55:03+00:00",
+      "run_id": "rep_2026-09-10T05-55-03_d126",
+      "mode": "replay",
+      "controller": "automation",
+      "type": "act",
+      "actor": "automation",
+      "payload": {
+        "surface": "act",
+        "action": "click",
+        "ok": true,
+        "navigated": true,
+        "dialog_opened": false,
+        "duration_ms": 91,
+        "note": null,
+        "risk_class": "read",
+        "kind": "role_name",
+        "index_used": 0
+      }
+    },
+    {
+      "ts": "2026-09-10T05:55:12+00:00",
+      "run_id": "rep_2026-09-10T05-55-03_d126",
+      "mode": "replay",
+      "controller": "automation",
+      "type": "error",
+      "step_id": "s1",
+      "actor": "automation",
+      "payload": {
+        "code": "CHECKPOINT_FAILED",
+        "message": "after s1 the page changed but the expected state never appeared",
+        "expected": "text_contains='Member Search' in frame 'main'",
+        "observed": {
+          "url": "http://127.0.0.1:8600/console/members/search",
+          "title": "Ledgerline Credit Union - Member Servicing Console",
+          "http_status": 200,
+          "dialog": null,
+          "visible_text_head": "Menu » Home » Members » Reports Signed in as <secret> » Sign Out Ledgerline Credit Union Member Servicing Console Attestation Required You must attest to the Member Privacy Policy before continuing. B",
+          "detector_hits": [],
+          "element_count": 5
+        }
+      }
+    }
+  ],
+  "allowed_resolutions": [
+    "retry_step",
+    "skip_step",
+    "complete",
+    "abort"
+  ],
+  "created_at": "2026-09-10T05:55:12+00:00",
+  "deadline": "2026-09-10T06:10:12",
+  "session_endpoint": "http://127.0.0.1:51035",
+  "claimed_by": "demo-operator",
+  "claimed_at": "2026-09-10T05:55:12+00:00",
+  "released_at": "2026-09-10T05:55:16+00:00",
+  "resolution": "retry_step",
+  "note": "Attested to the privacy policy on behalf of the branch; automation may retry the step."
+}

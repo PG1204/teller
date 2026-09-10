@@ -278,9 +278,10 @@ class ReplayRunner:
         for step in self.profile.login.steps:
             r = run_step(self.surface, token, step, self.cfg.params, secrets, self.ctx)
             if not r.ok:
-                raise _Stop(self._failure(FailureCode.CHECKPOINT_FAILED, f"harness login failed at {step.id}: {r.error}", step_id=step.id))
+                why = r.error or ("wait_for did not hold" if not r.wait_ok else "expectation failed")
+                raise _Stop(self._hard_failure(FailureCode.CHECKPOINT_FAILED, f"harness login failed at {step.id}: {why}", step, r.observation or self._observe(), expected=f"wait_for {step.wait_for.model_dump(exclude_none=True)}" if step.wait_for else None))
         if self.profile.login.checkpoint and not evaluate(self.profile.login.checkpoint, self._observe(), self.ctx):
-            raise _Stop(self._failure(FailureCode.CHECKPOINT_FAILED, "harness login checkpoint failed"))
+            raise _Stop(self._hard_failure(FailureCode.CHECKPOINT_FAILED, "harness login checkpoint failed", None, self._observe(), expected=describe(self.profile.login.checkpoint, self.cfg.params)))
         self.log.emit("login", {"ok": True})
 
     # ------------------------------------------------------------------ execution
@@ -294,7 +295,12 @@ class ReplayRunner:
             self._check_clock()
             try:
                 outcome = self._run_one(step)
-            except _Retry:  # a human fixed the state; run the same step again
+            except _Retry:  # a human fixed the state; run the same step again...
+                if step.expect and evaluate(step.expect, self._observe(), self.ctx):
+                    # ...unless the human's actions already produced this step's postcondition
+                    self.steps.append(StepReport(step_id=step.id, status="human", note="postcondition already held after handback"))
+                    self.log.emit("checkpoint", {"expect": describe(step.expect, self.cfg.params), "ok": True, "by": "handback"}, step_id=step.id)
+                    i += 1
                 continue
             except _Skip:  # a human performed the step; verify its postcondition and move on
                 if step.expect and not evaluate(step.expect, self._observe(), self.ctx):
@@ -323,6 +329,12 @@ class ReplayRunner:
         t0 = time.monotonic()
         # 1. sweep the current state before acting
         obs = self._observe()
+        if attempt > 1 and step.expect and evaluate(step.expect, obs, self.ctx):
+            # a remedy (interstitial acknowledged, session re-established, ...) already produced this
+            # step's postcondition: acting again would look for a control that is legitimately gone
+            self.steps.append(StepReport(step_id=step.id, status="ok", note="postcondition already held after recovery", screenshot=self._shot(f"{step.id}_after")))
+            self.log.emit("checkpoint", {"expect": describe(step.expect, self.cfg.params), "ok": True, "after": "recovery"}, step_id=step.id)
+            return "next"
         sw = sweep(obs, step, cap, profile, self.ctx, self.budgets)
         if not sw.empty:
             action = self._dispose(sw, step, obs)
@@ -449,6 +461,12 @@ class ReplayRunner:
             if action == "restart":
                 return "restart"
             return self._run_one(step, attempt=attempt + 1)
+        if step.expect and evaluate(step.expect, obs, self.ctx):
+            # the control is gone because the step's effect is already on screen (e.g. a redirect
+            # after a recovery landed on the target page): verified state beats re-acting
+            self.steps.append(StepReport(step_id=step.id, status="ok", note="target absent but postcondition holds", screenshot=self._shot(f"{step.id}_after")))
+            self.log.emit("checkpoint", {"expect": describe(step.expect, self.cfg.params), "ok": True, "resolved": False}, step_id=step.id)
+            return "next"
         if attempt == 1 and r.resolution is not None and r.resolution.failure == "not_found":
             # one bounded re-observe: the page may still be rendering
             self._sleep(750)

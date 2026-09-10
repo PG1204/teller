@@ -9,7 +9,6 @@ from pathlib import Path
 
 import typer
 
-replay_app = typer.Typer(add_completion=False)
 policy_app = typer.Typer(no_args_is_help=True, help="Static policy verification.")
 evidence_app = typer.Typer(no_args_is_help=True, help="Curate run directories into /evidence.")
 
@@ -24,7 +23,6 @@ def _kv(items: list[str]) -> dict[str, str]:
     return out
 
 
-@replay_app.callback(invoke_without_command=True)
 def replay(
     artifact: Path = typer.Argument(..., help="capabilities/<id>@<version>.yaml"),
     tenant: str = typer.Option("local", "--tenant"),
