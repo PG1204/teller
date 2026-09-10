@@ -378,7 +378,10 @@ class WebPlaywrightSurface:
                     except PlaywrightError:  # pragma: no cover
                         pass
         try:
-            screenshot = self._screenshot_bytes()
+            # Only the model needs pixels. Polling observations (waits, sweeps, handoff) take none:
+            # masked screenshots inject overlay elements, which would flicker in a headed window.
+            if badges:
+                screenshot = self._screenshot_bytes()
         finally:
             for _path, frame, _res in collected:
                 try:

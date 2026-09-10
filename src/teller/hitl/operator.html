@@ -28,6 +28,7 @@
     <div class="card"><h2>Live session</h2>
       <p class="hint">The automation paused on the <b>same</b> browser window it was driving (headed Chromium). Perform the manual step there, then resume below. <span id="cdp"></span></p>
       <img id="shot" src="/screenshot" alt="live screenshot">
+      <p class="hint" id="shotHint">Preview refreshes every few seconds until you claim; after that, the real browser window is the live view.</p>
     </div>
     <div class="card"><h2>Recent events</h2><pre id="events">…</pre></div>
   </section>
@@ -69,7 +70,13 @@ async function refresh() {
     const claimed = !!current.claimed_by && !current.released_at;
     document.getElementById('claimBox').style.display = claimed ? 'none' : '';
     document.getElementById('resumeBox').style.display = claimed ? '' : 'none';
-    document.getElementById('shot').src = '/screenshot?t=' + Date.now();
+    if (!claimed) {
+      // swap the preview only once the new frame has loaded, so it never flashes blank;
+      // once a human holds the session they are looking at the real window, so stop refreshing
+      const next = new Image();
+      next.onload = () => { document.getElementById('shot').src = next.src; };
+      next.src = '/screenshot?t=' + Date.now();
+    }
     const ev = await (await fetch('/events')).json();
     document.getElementById('events').textContent = ev.map(e => `${e.ts.slice(11,19)} ${e.type.padEnd(18)} ${e.step_id||'-'} ${JSON.stringify(e.payload).slice(0,140)}`).join('\n');
   } catch (e) { document.getElementById('log').textContent = 'refresh failed: ' + e; }

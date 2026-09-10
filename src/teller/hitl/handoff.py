@@ -100,7 +100,10 @@ class HandoffController:
             while True:
                 self._pump(page, 250)
                 now = time.monotonic()
-                if now - last_shot > 2.0:
+                # Live preview for the console only while nobody has claimed: once a human holds the
+                # session they are looking at the real window, and masked screenshots briefly inject
+                # overlay elements that would flicker under their hands.
+                if handoff.claimed_by is None and now - last_shot > 4.0:
                     try:
                         surface.screenshot(str(run_dir / "screenshots" / "handoff_live.jpg"))
                     except Exception:  # noqa: BLE001

@@ -70,8 +70,11 @@ Terminal 2 — discovery (real model), then replay (no model):
 
 # 4) human handoff on the live session (headed browser + operator console at http://127.0.0.1:8787)
 .venv/bin/teller chaos arm interstitial_unknown && .venv/bin/teller replay capabilities/ledgerline.member.read_savings_balance@1.0.0.yaml --param member_id=10001 --headed
-#   -> the run pauses on an "Attestation Required" screen it does not know; open the console, Claim,
+#   -> step 1 lands on an "Attestation Required" screen the artifact does not know. Do NOT touch the
+#      Chromium window yet: automation holds control until its 8 s wait times out and the terminal prints
+#      "HUMAN INTERVENTION REQUESTED" (console shows AWAITING_HUMAN). Then open the console, Claim,
 #      click "I attest" in the automation's own Chromium window, then "Hand control back" (retry_step).
+#      Faults are one-shot: arm again before each attempt.
 #   Headless twin of the same channel from another shell:
 .venv/bin/teller intervene claim <run_id> --operator you && .venv/bin/teller intervene resume <run_id> --mode retry_step
 ```
